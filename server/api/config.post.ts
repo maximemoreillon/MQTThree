@@ -17,11 +17,11 @@ const parseForm = (req: any) =>
 export default defineEventHandler(async (event) => {
   const { req } = event.node
   const { files } = (await parseForm(req)) as any
-  const { model } = files
-  if (!model) throw "Model not provided"
+  const { config } = files
+  if (!config) throw "Config file not provided"
 
-  const { filepath } = model
-  const newPath = `${path.join("public", "model", "model")}`
+  const { filepath } = config
+  const newPath = `${path.join("public", "config", "config.yml")}`
   fs.copyFileSync(filepath, newPath)
 
   return "Yes"
