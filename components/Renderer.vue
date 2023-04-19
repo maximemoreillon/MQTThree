@@ -1,4 +1,5 @@
 <template>
+  <LoginDialog :visible="false" />
   <canvas ref="canvas" />
 </template>
 
@@ -9,12 +10,21 @@ import * as THREE from "three"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 // @ts-ignore
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
+import * as MQTT from "paho-mqtt"
+
+const runtimeConfig = useRuntimeConfig()
+
+const { mqttHost, mqttPort } = runtimeConfig.public
+
+const mqttClient = new MQTT.Client(mqttHost, Number(mqttPort), "/", "paho")
 
 const canvas = ref()
 onMounted(async () => {
   const response = await fetch("/config/config.yml")
   const data = await response.text()
-  const devices = YAML.parse(data)
+  const devices = YAML.parse(data).map(
+    ({ topic, position }: any) => new Device({ topic, position })
+  )
 
   const scene = new THREE.Scene()
 
@@ -34,9 +44,8 @@ onMounted(async () => {
   const light = new THREE.AmbientLight(0xffffff, 1)
   scene.add(light)
 
-  devices.forEach(({ topic, position }: any) => {
-    const device = new Device({ topic, position })
-    scene.add(device.mesh)
+  devices.forEach(({ mesh }: any) => {
+    scene.add(mesh)
   })
 
   const loader = new GLTFLoader()
@@ -54,6 +63,31 @@ onMounted(async () => {
       console.error(error)
     }
   )
+
+  const raycaster = new THREE.Raycaster()
+
+  function onRendererClicked({ clientX, clientY }: any) {
+    // calculate pointer position in normalized device coordinates
+    // (-1 to +1) for both components
+
+    const pointer = new THREE.Vector2()
+    pointer.x = (clientX / window.innerWidth) * 2 - 1
+    pointer.y = -(clientY / window.innerHeight) * 2 + 1
+
+    raycaster.setFromCamera(pointer, camera)
+
+    // calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects(scene.children, true)
+
+    const foundDevice = devices.find(({ mesh }: any) =>
+      intersects.find(({ object }) => mesh === object)
+    )
+
+    if (!foundDevice) return
+    foundDevice.onClicked()
+  }
+
+  renderer.domElement.addEventListener("click", onRendererClicked)
 
   window.addEventListener(
     "resize",

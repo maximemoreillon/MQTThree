@@ -9,8 +9,10 @@ const {
 
 export default defineNuxtConfig({
   runtimeConfig: {
-    mqttHost: NUXT_MQTT_HOST,
-    mqttPort: NUXT_MQTT_PORT,
+    public: {
+      mqttHost: NUXT_MQTT_HOST,
+      mqttPort: NUXT_MQTT_PORT,
+    },
     mqttUsername: NUXT_MQTT_USERNAME,
     mqttPassword: NUXT_MQTT_PASSWORD,
   },
