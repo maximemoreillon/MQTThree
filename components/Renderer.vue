@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+import * as YAML from "yaml"
 import * as THREE from "three"
 // @ts-ignore
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
@@ -10,8 +11,11 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 
 const canvas = ref()
+onMounted(async () => {
+  const response = await fetch("/config/config.yml")
+  const data = await response.text()
+  const devices = YAML.parse(data)
 
-onMounted(() => {
   const scene = new THREE.Scene()
 
   // TODO: not adapting to window size but canvas size
@@ -28,8 +32,12 @@ onMounted(() => {
   camera.position.set(5, 5, 5)
 
   const light = new THREE.AmbientLight(0xffffff, 1)
-
   scene.add(light)
+
+  devices.forEach(({ topic, position }: any) => {
+    const device = new Device({ topic, position })
+    scene.add(device.mesh)
+  })
 
   const loader = new GLTFLoader()
   loader.load(
@@ -39,7 +47,7 @@ onMounted(() => {
     },
     // called while loading is progressing
     function (xhr: any) {
-      console.log((xhr.loaded / xhr.total) * 100 + "% loaded")
+      // console.log((xhr.loaded / xhr.total) * 100 + "% loaded")
     },
     // called when loading has errors
     function (error: any) {

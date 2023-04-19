@@ -1,19 +1,28 @@
 <template>
   <v-dialog v-model="dialog" width="30rem">
     <template v-slot:activator="{ props }">
-      <v-btn color="primary" v-bind="props" position="absolute">
-        Upload model
-      </v-btn>
+      <v-btn
+        color="primary"
+        v-bind="props"
+        position="absolute"
+        icon="mdi-upload"
+      />
     </template>
 
-    <v-card>
+    <v-card title="Model upload">
       <v-card-text>
-        <v-file-input label="Model" v-model="modelFile" />
+        <v-row align="center">
+          <v-col>
+            <v-file-input label="Model" v-model="modelFile" />
+          </v-col>
+          <v-col cols="auto">
+            <v-btn @click="upload()">Upload</v-btn>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn @click="dialog = false"> Close </v-btn>
-        <v-btn @click="upload()">Upload</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
