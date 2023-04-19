@@ -1,5 +1,5 @@
 <template>
-  <LoginDialog :visible="false" />
+  <LoginDialog />
   <canvas ref="canvas" />
 </template>
 
@@ -11,20 +11,44 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 // @ts-ignore
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 import * as MQTT from "paho-mqtt"
+import Device from "~/utils/Device"
 
-const runtimeConfig = useRuntimeConfig()
-
-const { mqttHost, mqttPort } = runtimeConfig.public
-
-const mqttClient = new MQTT.Client(mqttHost, Number(mqttPort), "/", "paho")
-
+const mqtt = useMqtt()
 const canvas = ref()
+
 onMounted(async () => {
   const response = await fetch("/config/config.yml")
   const data = await response.text()
   const devices = YAML.parse(data).map(
     ({ topic, position }: any) => new Device({ topic, position })
   )
+
+  mqtt.value.onConnected = () => {
+    devices.forEach(({ topic }: any) => {
+      console.log(`[MQTT] Subscribing to ${topic}`)
+      mqtt.value.subscribe(`${topic}/status`)
+    })
+  }
+
+  mqtt.value.onMessageArrived = (message: any) => {
+    try {
+      const { payloadString, topic } = message
+      const foundDevice = devices.find(
+        (device: Device) => `${device.topic}/status` === topic
+      )
+      if (!foundDevice) return
+      const { state } = JSON.parse(payloadString)
+      if (state.toLowerCase() === "off") {
+        foundDevice.light.intensity = 0
+        foundDevice.material.color.set("#5c5400")
+      } else if (state.toLowerCase() === "on") {
+        foundDevice.material.color.set("#ffea00")
+        foundDevice.light.intensity = 1
+      }
+    } catch (error) {
+      console.warn(error)
+    }
+  }
 
   const scene = new THREE.Scene()
 
@@ -35,17 +59,23 @@ onMounted(async () => {
   canvas.value.width = width
   canvas.value.height = height
 
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas.value })
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas.value,
+    antialias: true,
+  })
+  renderer.shadowMap.enabled = true
+
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
   const controls = new OrbitControls(camera, renderer.domElement)
 
   camera.position.set(5, 5, 5)
 
-  const light = new THREE.AmbientLight(0xffffff, 1)
+  const light = new THREE.AmbientLight(0xffffff, 0.2)
   scene.add(light)
 
-  devices.forEach(({ mesh }: any) => {
+  devices.forEach(({ mesh, light }: any) => {
     scene.add(mesh)
+    scene.add(light)
   })
 
   const loader = new GLTFLoader()
@@ -64,8 +94,8 @@ onMounted(async () => {
     }
   )
 
+  // Click events
   const raycaster = new THREE.Raycaster()
-
   function onRendererClicked({ clientX, clientY }: any) {
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
@@ -84,7 +114,11 @@ onMounted(async () => {
     )
 
     if (!foundDevice) return
-    foundDevice.onClicked()
+
+    // TODO: would be nicer to have a method in the Device class
+    const message = new MQTT.Message(JSON.stringify({ state: "toggle" }))
+    message.destinationName = `${foundDevice.topic}/command`
+    mqtt.value.send(message)
   }
 
   renderer.domElement.addEventListener("click", onRendererClicked)

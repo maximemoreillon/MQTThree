@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="visible" max-width="30rem" persistent>
+  <v-dialog v-model="visible" max-width="30rem" persistent>
     <v-card>
       <v-card-text>
         <v-form class="text-center" @submit.prevent="login()">
@@ -31,13 +31,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
-const props = defineProps({
-  visible: Boolean,
-})
+const mqtt = useMqtt()
+
+const visible = ref(true)
 const username = ref("")
 const password = ref("")
 const loading = ref(false)
+
+onMounted(() => {
+  if (!mqtt.value.isConnected()) connect()
+  else visible.value = false
+})
 
 const login = () => {
   const localStorageContent = JSON.stringify({
@@ -45,5 +49,35 @@ const login = () => {
     password: password.value,
   })
   localStorage.setItem("mqtt", localStorageContent)
+  connect()
+}
+
+const connect = () => {
+  loading.value = true
+  const localStorageContent = localStorage.getItem("mqtt")
+  if (!localStorageContent) {
+    loading.value = false
+    console.log("credentials do not exist")
+    return
+  }
+  const { username, password } = JSON.parse(localStorageContent)
+  mqtt.value.connect({
+    onSuccess,
+    onFailure,
+    userName: username,
+    password: password,
+    useSSL: true,
+    keepAliveInterval: 30,
+    reconnect: true,
+  })
+}
+const onSuccess = () => {
+  console.log("[MQTT] Success!")
+  loading.value = false
+  visible.value = false
+}
+const onFailure = () => {
+  console.log("[MQTT] Failure!")
+  loading.value = false
 }
 </script>

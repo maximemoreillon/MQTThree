@@ -5,7 +5,6 @@ class Device {
   material: THREE.MeshBasicMaterial
   mesh: THREE.Mesh
   light: THREE.PointLight
-  state: string
 
   constructor(opts: any) {
     const {
@@ -22,12 +21,6 @@ class Device {
     this.light = new THREE.PointLight(0xffffff, 1, 100)
     this.light.castShadow = true
     this.light.position.set(x, y, z)
-
-    this.state = "off"
-  }
-
-  onClicked() {
-    console.log("I have been clicked")
   }
 }
 
