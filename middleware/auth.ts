@@ -1,5 +1,4 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  console.log("AuthMiddlware")
   const jwt = useCookie("jwt")
   const user = useUser()
   if (!jwt.value) {

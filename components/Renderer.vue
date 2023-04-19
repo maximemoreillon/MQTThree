@@ -5,51 +5,64 @@
 
 <script setup lang="ts">
 import * as YAML from "yaml"
+import * as MQTT from "paho-mqtt"
 import * as THREE from "three"
 // @ts-ignore
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 // @ts-ignore
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
-import * as MQTT from "paho-mqtt"
+import { v4 as uuidv4 } from "uuid"
+
 import Device from "~/utils/Device"
 
+// Create the MQTT client
 const mqtt = useMqtt()
+const runtimeConfig = useRuntimeConfig()
+const { mqttHost, mqttPort } = runtimeConfig.public
+mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
+
 const canvas = ref()
 
-onMounted(async () => {
-  const response = await fetch("/config/config.yml")
-  const data = await response.text()
-  const devices = YAML.parse(data).map(
-    ({ topic, position }: any) => new Device({ topic, position })
-  )
+// Getting devices from .yml file
+const response = await fetch("/config/config.yml")
+const data = await response.text()
+const devices = YAML.parse(data).map(
+  ({ topic, position }: any) => new Device({ topic, position })
+)
 
-  mqtt.value.onConnected = () => {
-    devices.forEach(({ topic }: any) => {
-      console.log(`[MQTT] Subscribing to ${topic}`)
-      mqtt.value.subscribe(`${topic}/status`)
-    })
-  }
+mqtt.value.onConnected = () => {
+  devices.forEach(({ topic }: any) => {
+    mqtt.value.subscribe(`${topic}/status`)
+  })
+}
 
-  mqtt.value.onMessageArrived = (message: any) => {
-    try {
-      const { payloadString, topic } = message
-      const foundDevice = devices.find(
-        (device: Device) => `${device.topic}/status` === topic
-      )
-      if (!foundDevice) return
-      const { state } = JSON.parse(payloadString)
-      if (state.toLowerCase() === "off") {
-        foundDevice.light.intensity = 0
-        foundDevice.material.color.set("#5c5400")
-      } else if (state.toLowerCase() === "on") {
-        foundDevice.material.color.set("#ffea00")
-        foundDevice.light.intensity = 1
-      }
-    } catch (error) {
-      console.warn(error)
+mqtt.value.onMessageArrived = (message: any) => {
+  try {
+    const { payloadString, topic } = message
+    const foundDevice = devices.find(
+      (device: Device) => `${device.topic}/status` === topic
+    )
+    if (!foundDevice) return
+    const { state } = JSON.parse(payloadString)
+    if (state.toLowerCase() === "off") {
+      foundDevice.light.intensity = 0
+      foundDevice.material.color.set("#5c5400")
+    } else if (state.toLowerCase() === "on") {
+      foundDevice.material.color.set("#ffea00")
+      foundDevice.light.intensity = 1
     }
+  } catch (error) {
+    console.warn(error)
   }
+}
 
+mqtt.value.onConnectionLost = (responseObject: any) => {
+  if (responseObject.errorCode !== 0) {
+    console.log("onConnectionLost:" + responseObject.errorMessage)
+  }
+}
+
+onMounted(async () => {
   const scene = new THREE.Scene()
 
   // TODO: not adapting to window size but canvas size
@@ -61,9 +74,8 @@ onMounted(async () => {
 
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas.value,
-    antialias: true,
+    // antialias: true,
   })
-  renderer.shadowMap.enabled = true
 
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
   const controls = new OrbitControls(camera, renderer.domElement)

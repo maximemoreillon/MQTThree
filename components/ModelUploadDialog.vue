@@ -1,7 +1,8 @@
 <template>
-  <v-dialog v-model="dialog" width="30rem">
+  <v-dialog v-model="dialog" width="40rem">
     <template v-slot:activator="{ props }">
       <v-btn
+        class="ma-4"
         color="primary"
         v-bind="props"
         position="absolute"
@@ -11,12 +12,12 @@
 
     <v-card title="Model upload">
       <v-card-text>
-        <v-row align="center">
+        <v-row align="baseline">
           <v-col>
             <v-file-input label="Model" v-model="modelFile" />
           </v-col>
           <v-col cols="auto">
-            <v-btn @click="upload()">Upload</v-btn>
+            <v-btn @click="upload()" prepend-icon="mdi-upload">Upload</v-btn>
           </v-col>
         </v-row>
       </v-card-text>
