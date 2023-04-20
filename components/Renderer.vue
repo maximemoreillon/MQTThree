@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import * as MQTT from "paho-mqtt"
+import MQTT from "paho-mqtt"
 
 import { v4 as uuidv4 } from "uuid"
 

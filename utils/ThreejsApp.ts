@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import * as YAML from "yaml"
-import { Client } from "paho-mqtt"
+import MQTT from "paho-mqtt"
 
 // @ts-ignore
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
@@ -11,7 +11,7 @@ import Light from "./Light"
 import Sensor from "./Sensor"
 
 class ThreejsApp {
-  mqttClient: Client
+  mqttClient: MQTT.Client
   scene: THREE.Scene
   renderer: THREE.WebGLRenderer
   camera: THREE.Camera
@@ -20,7 +20,7 @@ class ThreejsApp {
 
   devices: (Light | Sensor)[]
 
-  constructor(canvas: HTMLElement, mqttClient: Client) {
+  constructor(canvas: HTMLElement, mqttClient: MQTT.Client) {
     this.mqttClient = mqttClient
     this.scene = new THREE.Scene()
     this.renderer = new THREE.WebGLRenderer({ canvas })

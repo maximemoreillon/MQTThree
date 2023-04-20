@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import Device from "./Device"
-import { Message } from "paho-mqtt"
+import MQTT from "paho-mqtt"
+
 class Light extends Device {
   commandTopic: string
   light: THREE.PointLight
@@ -34,7 +35,7 @@ class Light extends Device {
   }
 
   onClicked() {
-    const message = new Message(JSON.stringify({ state: "toggle" }))
+    const message = new MQTT.Message(JSON.stringify({ state: "toggle" }))
     message.destinationName = this.commandTopic
     this.mqttClient.send(message)
   }
