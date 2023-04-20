@@ -43,17 +43,19 @@ class ThreejsApp {
     window.addEventListener("resize", this.onWindowResized, false)
     this.renderer.domElement.addEventListener("click", this.onRendererClicked)
 
-    mqttClient.onMessageArrived = ({ topic, payloadString }: any) => {
-      try {
-        const foundDevice: any = this.devices.find(
-          (device: any) => device.topic === topic
-        )
-        if (!foundDevice) return
-        const { state } = JSON.parse(payloadString)
-        foundDevice.stateUpdate(state)
-      } catch (error) {
-        console.warn(error)
-      }
+    mqttClient.onMessageArrived = this.onMqttMessageArrived
+  }
+
+  onMqttMessageArrived = ({ topic, payloadString }: any) => {
+    try {
+      const foundDevice: any = this.devices.find(
+        (device: any) => device.topic === topic
+      )
+      if (!foundDevice) return
+      const payloadJson = JSON.parse(payloadString)
+      foundDevice.stateUpdate(payloadJson)
+    } catch (error) {
+      console.warn(error)
     }
   }
 
@@ -64,12 +66,20 @@ class ThreejsApp {
       const data = await response.text()
 
       this.devices = YAML.parse(data).map(
-        ({ type, topic, position, commandTopic }: any) => {
+        ({ type, topic, position, commandTopic, key }: any) => {
           if (type === "light")
             return new Light({
               topic,
               position,
               commandTopic,
+              mqttClient: this.mqttClient,
+              scene: this.scene,
+            })
+          else if (type === "sensor")
+            return new Sensor({
+              topic,
+              position,
+              key,
               mqttClient: this.mqttClient,
               scene: this.scene,
             })
