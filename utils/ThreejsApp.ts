@@ -23,6 +23,7 @@ class ThreejsApp {
   constructor(canvas: HTMLElement, mqttClient: MQTT.Client) {
     this.mqttClient = mqttClient
     this.scene = new THREE.Scene()
+    this.scene.background = new THREE.Color("#444444")
     this.renderer = new THREE.WebGLRenderer({ canvas })
     this.raycaster = new THREE.Raycaster()
 
@@ -60,32 +61,24 @@ class ThreejsApp {
   }
 
   getDevicesFromYaml = async () => {
-    // Getting devices from .yml file
     try {
       const response = await fetch("/api/config")
       const data = await response.text()
 
-      this.devices = YAML.parse(data).map(
-        ({ type, topic, position, commandTopic, key, unit }: any) => {
-          if (type === "light")
-            return new Light({
-              topic,
-              position,
-              commandTopic,
-              mqttClient: this.mqttClient,
-              scene: this.scene,
-            })
-          else if (type === "sensor")
-            return new Sensor({
-              topic,
-              position,
-              key,
-              unit,
-              mqttClient: this.mqttClient,
-              scene: this.scene,
-            })
-        }
-      )
+      this.devices = YAML.parse(data).map(({ type, ...properties }: any) => {
+        if (type === "light")
+          return new Light({
+            ...properties,
+            mqttClient: this.mqttClient,
+            scene: this.scene,
+          })
+        else if (type === "sensor")
+          return new Sensor({
+            ...properties,
+            mqttClient: this.mqttClient,
+            scene: this.scene,
+          })
+      })
     } catch (error) {
       console.warn("Config file not found or invalid")
     }

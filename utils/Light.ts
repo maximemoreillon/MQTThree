@@ -7,6 +7,7 @@ class Light extends Device {
   light: THREE.PointLight
   mesh: THREE.Mesh
   material: THREE.MeshBasicMaterial
+  state: string
   // IDEA: have MQTT client attribute
 
   constructor(opts: any) {
@@ -32,19 +33,24 @@ class Light extends Device {
     // TODO: consider a dedicated method so as to benefit from inheritence
     this.scene.add(this.mesh)
     this.scene.add(this.light)
+
+    this.state = "unknown"
   }
 
   onClicked() {
-    const message = new MQTT.Message(JSON.stringify({ state: "toggle" }))
+    // TODO: would be simpler with just "toggle" as this.state would not be needed
+    const state = this.state === "on" ? "off" : "on"
+    const message = new MQTT.Message(JSON.stringify({ state }))
     message.destinationName = this.commandTopic
     this.mqttClient.send(message)
   }
 
   stateUpdate({ state }: any): void {
-    if (state.toLowerCase() === "off") {
+    this.state = state.toLowerCase()
+    if (this.state === "off") {
       this.light.intensity = 0
       this.material.color.set("#5c5400")
-    } else if (state.toLowerCase() === "on") {
+    } else if (this.state === "on") {
       this.material.color.set("#ffea00")
       this.light.intensity = 1
     }
