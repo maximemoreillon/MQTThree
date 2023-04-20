@@ -1,8 +1,7 @@
 <template>
   <v-row align="baseline">
     <v-col>
-      <!-- <v-file-input label="Model" v-model="file" accept=".gltf,.glb" /> -->
-      <v-file-input label="Model" v-model="file" />
+      <v-file-input label="Model" v-model="file" accept=".gltf,.glb" />
     </v-col>
     <v-col cols="auto">
       <v-btn @click="upload()" prepend-icon="mdi-upload" :loading="loading">
