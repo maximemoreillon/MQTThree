@@ -9,8 +9,11 @@ export default defineEventHandler(async (event) => {
   const { config } = files
   if (!config) throw "Config file not provided"
 
+  const configPath = path.resolve("config")
+
+  if (!fs.existsSync(configPath)) fs.mkdirSync(configPath)
+
   const { filepath } = config
-  const configPath = path.resolve("public/config")
   const newPath = path.join(configPath, "config.yml")
   console.log(newPath)
   fs.copyFileSync(filepath, newPath)

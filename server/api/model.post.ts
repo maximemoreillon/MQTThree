@@ -10,8 +10,10 @@ export default defineEventHandler(async (event) => {
   const { model } = files
   if (!model) throw "Model not provided"
 
+  const configPath = path.resolve("config")
+  if (!fs.existsSync(configPath)) fs.mkdirSync(configPath)
+
   const { filepath } = model
-  const configPath = path.resolve("public/config")
   const newPath = path.join(configPath, "model")
   console.log({ newPath })
   fs.copyFileSync(filepath, newPath)

@@ -62,7 +62,7 @@ class ThreejsApp {
   getDevicesFromYaml = async () => {
     // Getting devices from .yml file
     try {
-      const response = await fetch("/config/config.yml")
+      const response = await fetch("/api/config")
       const data = await response.text()
 
       this.devices = YAML.parse(data).map(
@@ -92,7 +92,7 @@ class ThreejsApp {
 
   loadModel = () => {
     new GLTFLoader().load(
-      "/config/model",
+      "/api/model",
       (gltf: any) => {
         this.scene.add(gltf.scene)
       },
