@@ -23,12 +23,18 @@ mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
 
 const canvas = ref()
 
+let devices: Device[] = []
+
 // Getting devices from .yml file
-const response = await fetch("/config/config.yml")
-const data = await response.text()
-const devices = YAML.parse(data).map(
-  ({ topic, position }: any) => new Device({ topic, position })
-)
+try {
+  const response = await fetch("/config/config.yml")
+  const data = await response.text()
+  devices = YAML.parse(data).map(
+    ({ topic, position }: any) => new Device({ topic, position })
+  )
+} catch (error) {
+  console.warn("Config file not found or invalid")
+}
 
 mqtt.value.onConnected = () => {
   devices.forEach(({ topic }: any) => {
@@ -39,7 +45,7 @@ mqtt.value.onConnected = () => {
 mqtt.value.onMessageArrived = (message: any) => {
   try {
     const { payloadString, topic } = message
-    const foundDevice = devices.find(
+    const foundDevice: any = devices.find(
       (device: Device) => `${device.topic}/status` === topic
     )
     if (!foundDevice) return
@@ -121,7 +127,7 @@ onMounted(async () => {
     // calculate objects intersecting the picking ray
     const intersects = raycaster.intersectObjects(scene.children, true)
 
-    const foundDevice = devices.find(({ mesh }: any) =>
+    const foundDevice: any = devices.find(({ mesh }: any) =>
       intersects.find(({ object }) => mesh === object)
     )
 
