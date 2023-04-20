@@ -30,7 +30,8 @@ try {
   const response = await fetch("/config/config.yml")
   const data = await response.text()
   devices = YAML.parse(data).map(
-    ({ topic, position }: any) => new Device({ topic, position })
+    ({ topic, position, commandTopic }: any) =>
+      new Device({ topic, position, commandTopic })
   )
 } catch (error) {
   console.warn("Config file not found or invalid")
@@ -38,7 +39,7 @@ try {
 
 mqtt.value.onConnected = () => {
   devices.forEach(({ topic }: any) => {
-    mqtt.value.subscribe(`${topic}/status`)
+    mqtt.value.subscribe(topic)
   })
 }
 
@@ -46,7 +47,7 @@ mqtt.value.onMessageArrived = (message: any) => {
   try {
     const { payloadString, topic } = message
     const foundDevice: any = devices.find(
-      (device: Device) => `${device.topic}/status` === topic
+      (device: Device) => device.topic === topic
     )
     if (!foundDevice) return
     const { state } = JSON.parse(payloadString)
@@ -132,10 +133,12 @@ onMounted(async () => {
     )
 
     if (!foundDevice) return
+    const { commandTopic } = foundDevice
+    if (!commandTopic) return
 
     // TODO: would be nicer to have a method in the Device class
     const message = new MQTT.Message(JSON.stringify({ state: "toggle" }))
-    message.destinationName = `${foundDevice.topic}/command`
+    message.destinationName = commandTopic
     mqtt.value.send(message)
   }
 
