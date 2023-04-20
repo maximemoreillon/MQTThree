@@ -66,7 +66,7 @@ class ThreejsApp {
       const data = await response.text()
 
       this.devices = YAML.parse(data).map(
-        ({ type, topic, position, commandTopic, key }: any) => {
+        ({ type, topic, position, commandTopic, key, unit }: any) => {
           if (type === "light")
             return new Light({
               topic,
@@ -80,6 +80,7 @@ class ThreejsApp {
               topic,
               position,
               key,
+              unit,
               mqttClient: this.mqttClient,
               scene: this.scene,
             })

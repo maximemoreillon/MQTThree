@@ -3,30 +3,27 @@ import Device from "./Device"
 
 class Sensor extends Device {
   key: string
+  unit: string
   spriteMaterial: THREE.SpriteMaterial
 
   constructor(opts: any) {
     const {
       position: { x = 0, y = 0, z = 0 },
       key,
+      unit = "",
     } = opts
 
     super(opts)
 
     this.key = key
-
-    const geometry = new THREE.SphereGeometry(0.15, 100, 100)
-    const material = new THREE.MeshBasicMaterial({ color: "green" })
-    const mesh = new THREE.Mesh(geometry, material)
-    mesh.position.set(x, y, z)
-    this.scene.add(mesh)
+    this.unit = unit
 
     const map = this.generateTextureMapWithText("--")
 
     this.spriteMaterial = new THREE.SpriteMaterial({ map })
 
     const sprite = new THREE.Sprite(this.spriteMaterial)
-    sprite.position.set(x, y + 0.3, z)
+    sprite.position.set(x, y, z)
     this.scene.add(sprite)
   }
 
@@ -66,8 +63,10 @@ class Sensor extends Device {
   }
 
   stateUpdate(payload: any): void {
-    const value = payload[this.key]
-    this.spriteMaterial.map = this.generateTextureMapWithText(value)
+    const value = Math.round(payload[this.key])
+    this.spriteMaterial.map = this.generateTextureMapWithText(
+      `${value} ${this.unit}`
+    )
   }
 }
 
