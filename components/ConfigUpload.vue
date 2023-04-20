@@ -28,7 +28,8 @@ const upload = async () => {
 
   try {
     await axios.post(`/api/config`, body, { headers })
-    location.reload()
+    alert('Upload finished, please refresht the page')
+    // location.reload()
   } catch (error) {
     alert(`Upload failed`)
     console.error(error)
