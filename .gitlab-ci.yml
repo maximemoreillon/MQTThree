@@ -4,20 +4,38 @@ stages:
 
 variables:
   APPLICATION_NAME: mqtthree
+  CONTAINER_IMAGE: ${DOCKER_HUB_USERNAME}/${APPLICATION_NAME}
   CONTAINER_IMAGE_TAGGED: ${DOCKER_HUB_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_SHORT_SHA}
+  K8S_INGRESS_HOST: mqtthree.home.maximemoreillon.com
 
 image: moreillon/ci-dind
 services:
   - name: docker:19.03.12-dind
 
 build:
+  only:
+    - master
   stage: build
   tags:
     - dind
-  only:
-    - master
   before_script:
     - echo "${DOCKER_HUB_PASSWORD}" | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
   script:
-    - docker build -t ${CONTAINER_IMAGE_TAGGED} .
+    # Building
+    - docker build -t ${CONTAINER_IMAGE} .
+    # Tagging
+    - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE_TAGGED}
+    # Pushing
+    - docker push ${CONTAINER_IMAGE}
     - docker push ${CONTAINER_IMAGE_TAGGED}
+
+deploy:
+  only:
+    - master
+  stage: deploy
+  tags:
+    - dind
+  before_script:
+    - kubectl config use-context moreillon_ci/moreillon_k8s_home/kubernetes-agent:home
+  script:
+    - envsubst < kubernetes_manifest.yml | kubectl apply -n ${KUBERNETES_NAMESPACE} -f -
