@@ -1,3 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${APPLICATION_NAME}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,6 +33,14 @@ spec:
               value: mqtt.home.maximemoreillon.com
             - name: NUXT_PUBLIC_MQTT_PORT
               value: "443"
+          volumeMounts:
+            - mountPath: /app/.output/config
+              name: ${APPLICATION_NAME}
+      volumes:
+        - name: ${APPLICATION_NAME}
+          persistentVolumeClaim:
+            claimName: ${APPLICATION_NAME}
+
 ---
 apiVersion: v1
 kind: Service
