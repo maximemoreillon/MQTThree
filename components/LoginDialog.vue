@@ -72,12 +72,10 @@ const connect = () => {
   })
 }
 const onSuccess = () => {
-  console.log("[MQTT] Success!")
   loading.value = false
   visible.value = false
 }
 const onFailure = () => {
-  console.log("[MQTT] Failure!")
   loading.value = false
 }
 </script>

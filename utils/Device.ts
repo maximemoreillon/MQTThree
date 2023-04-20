@@ -29,9 +29,14 @@ class Device {
     this.material = new THREE.MeshBasicMaterial({ color: "#444444" })
     this.mesh = new THREE.Mesh(geometry, this.material)
     this.mesh.position.set(x, y, z)
+
     this.mqttClient = mqttClient
+    mqttClient.subscribe(this.topic)
 
     // IDEA could have MQTT listener here, but would make a lot of listeners
+    // mqttClient.onMessageArrived = ({ topic }: any) => {
+    //   if (topic === this.topic) console.log(this.topic)
+    // }
   }
   stateUpdate(newState: any) {
     console.log(newState)
