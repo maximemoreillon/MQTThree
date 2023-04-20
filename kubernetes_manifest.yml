@@ -18,9 +18,9 @@ spec:
           ports:
             - containerPort: 3000
           env:
-            - name: NUXT_MQTT_HOST
+            - name: NUXT_PUBLIC_MQTT_HOST
               value: mqtt.home.maximemoreillon.com
-            - name: NUXT_MQTT_PORT
+            - name: NUXT_PUBLIC_MQTT_PORT
               value: "443"
 ---
 apiVersion: v1
