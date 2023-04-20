@@ -1,7 +1,8 @@
 <template>
   <v-row align="baseline">
     <v-col>
-      <v-file-input label="Model" v-model="file" accept=".gltf,.glb" />
+      <!-- <v-file-input label="Model" v-model="file" accept=".gltf,.glb" /> -->
+      <v-file-input label="Model" v-model="file" />
     </v-col>
     <v-col cols="auto">
       <v-btn @click="upload()" prepend-icon="mdi-upload" :loading="loading">
@@ -16,7 +17,6 @@
 import axios from 'axios'
 
 
-const dialog = ref(false)
 const file = ref()
 const loading = ref(false)
 
@@ -27,7 +27,7 @@ const upload = async () => {
   const headers = { "Content-Type": "multipart/form-data" }
 
   try {
-    await axios.post(`/api//model`, body, { headers })
+    await axios.post(`/api/model`, body, { headers })
     alert('Upload finished, please refresht the page')
     // location.reload()
   } catch (error) {

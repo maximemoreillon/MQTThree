@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <ModelUploadDialog />
+      <UploadDialog />
       <ClientOnly>
         <Renderer />
       </ClientOnly>

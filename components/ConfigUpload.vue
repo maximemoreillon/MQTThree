@@ -16,7 +16,6 @@
 import axios from 'axios'
 
 
-const dialog = ref(false)
 const file = ref()
 const loading = ref(false)
 
