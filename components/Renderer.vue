@@ -23,19 +23,7 @@ mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
 
 const canvas = ref()
 
-let devices: Device[] = []
-
-// Getting devices from .yml file
-try {
-  const response = await fetch("/config/config.yml")
-  const data = await response.text()
-  devices = YAML.parse(data).map(
-    ({ topic, position, commandTopic }: any) =>
-      new Device({ topic, position, commandTopic })
-  )
-} catch (error) {
-  console.warn("Config file not found or invalid")
-}
+let devices: Light[] = []
 
 mqtt.value.onConnected = () => {
   devices.forEach(({ topic }: any) => {
@@ -51,13 +39,7 @@ mqtt.value.onMessageArrived = (message: any) => {
     )
     if (!foundDevice) return
     const { state } = JSON.parse(payloadString)
-    if (state.toLowerCase() === "off") {
-      foundDevice.light.intensity = 0
-      foundDevice.material.color.set("#5c5400")
-    } else if (state.toLowerCase() === "on") {
-      foundDevice.material.color.set("#ffea00")
-      foundDevice.light.intensity = 1
-    }
+    foundDevice.stateUpdate(state)
   } catch (error) {
     console.warn(error)
   }
@@ -70,8 +52,6 @@ mqtt.value.onConnectionLost = (responseObject: any) => {
 }
 
 onMounted(async () => {
-  const scene = new THREE.Scene()
-
   // TODO: not adapting to window size but canvas size
   // const { offsetWidth: width, offsetHeight: height } = canvas.value.parentNode
   const { innerWidth: width, innerHeight: height } = window
@@ -84,6 +64,28 @@ onMounted(async () => {
     // antialias: true,
   })
 
+  const scene = new THREE.Scene()
+
+  // Getting devices from .yml file
+  try {
+    const response = await fetch("/config/config.yml")
+    const data = await response.text()
+
+    // FIXME: this needs to move into onMounted and scene must be passed
+    devices = YAML.parse(data).map(
+      ({ topic, position, commandTopic }: any) =>
+        new Light({
+          topic,
+          position,
+          commandTopic,
+          mqttClient: mqtt.value,
+          scene,
+        })
+    )
+  } catch (error) {
+    console.warn("Config file not found or invalid")
+  }
+
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
   const controls = new OrbitControls(camera, renderer.domElement)
 
@@ -92,23 +94,19 @@ onMounted(async () => {
   const light = new THREE.AmbientLight(0xffffff, 0.2)
   scene.add(light)
 
-  devices.forEach(({ mesh, light }: any) => {
-    scene.add(mesh)
-    scene.add(light)
-  })
-
   const loader = new GLTFLoader()
   loader.load(
     "/model/model",
-    function (gltf: any) {
+    (gltf: any) => {
       scene.add(gltf.scene)
     },
     // called while loading is progressing
-    function (xhr: any) {
+    (xhr: any) => {
+      // TODO: show in a dialog
       // console.log((xhr.loaded / xhr.total) * 100 + "% loaded")
     },
     // called when loading has errors
-    function (error: any) {
+    (error: any) => {
       console.error(error)
     }
   )
@@ -133,13 +131,7 @@ onMounted(async () => {
     )
 
     if (!foundDevice) return
-    const { commandTopic } = foundDevice
-    if (!commandTopic) return
-
-    // TODO: would be nicer to have a method in the Device class
-    const message = new MQTT.Message(JSON.stringify({ state: "toggle" }))
-    message.destinationName = commandTopic
-    mqtt.value.send(message)
+    foundDevice.onClicked()
   }
 
   renderer.domElement.addEventListener("click", onRendererClicked)
