@@ -10,7 +10,6 @@ import * as THREE from "three"
 // @ts-ignore
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 // @ts-ignore
-import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 import { v4 as uuidv4 } from "uuid"
 
 import Device from "~/utils/Device"
@@ -23,7 +22,7 @@ mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
 
 const canvas = ref()
 
-let devices: Light[] = []
+let devices: any[] = []
 
 mqtt.value.onConnected = () => {
   devices.forEach(({ topic }: any) => {
@@ -51,20 +50,15 @@ mqtt.value.onConnectionLost = (responseObject: any) => {
   }
 }
 
+// TODO: think of
 onMounted(async () => {
   // TODO: not adapting to window size but canvas size
   // const { offsetWidth: width, offsetHeight: height } = canvas.value.parentNode
   const { innerWidth: width, innerHeight: height } = window
-
   canvas.value.width = width
   canvas.value.height = height
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas: canvas.value,
-    // antialias: true,
-  })
-
-  const scene = new THREE.Scene()
+  const threejsApp = new ThreejsApp(canvas.value)
 
   // Getting devices from .yml file
   try {
@@ -79,26 +73,18 @@ onMounted(async () => {
           position,
           commandTopic,
           mqttClient: mqtt.value,
-          scene,
+          scene: threejsApp.scene,
         })
     )
   } catch (error) {
     console.warn("Config file not found or invalid")
   }
 
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-  const controls = new OrbitControls(camera, renderer.domElement)
-
-  camera.position.set(5, 5, 5)
-
-  const light = new THREE.AmbientLight(0xffffff, 0.2)
-  scene.add(light)
-
   const loader = new GLTFLoader()
   loader.load(
     "/model/model",
     (gltf: any) => {
-      scene.add(gltf.scene)
+      threejsApp.scene.add(gltf.scene)
     },
     // called while loading is progressing
     (xhr: any) => {
@@ -121,10 +107,13 @@ onMounted(async () => {
     pointer.x = (clientX / window.innerWidth) * 2 - 1
     pointer.y = -(clientY / window.innerHeight) * 2 + 1
 
-    raycaster.setFromCamera(pointer, camera)
+    raycaster.setFromCamera(pointer, threejsApp.camera)
 
     // calculate objects intersecting the picking ray
-    const intersects = raycaster.intersectObjects(scene.children, true)
+    const intersects = raycaster.intersectObjects(
+      threejsApp.scene.children,
+      true
+    )
 
     const foundDevice: any = devices.find(({ mesh }: any) =>
       intersects.find(({ object }) => mesh === object)
@@ -134,28 +123,6 @@ onMounted(async () => {
     foundDevice.onClicked()
   }
 
-  renderer.domElement.addEventListener("click", onRendererClicked)
-
-  window.addEventListener(
-    "resize",
-    () => {
-      // const { offsetWidth: width, offsetHeight: height } = canvas.value.parentNode
-      const { innerWidth: width, innerHeight: height } = window
-      canvas.value.width = width
-      canvas.value.height = height
-      camera.aspect = width / height
-      camera.updateProjectionMatrix()
-      renderer.setSize(width, height)
-    },
-    false
-  )
-
-  function animate() {
-    requestAnimationFrame(animate)
-    controls.update()
-
-    renderer.render(scene, camera)
-  }
-  animate()
+  threejsApp.renderer.domElement.addEventListener("click", onRendererClicked)
 })
 </script>
