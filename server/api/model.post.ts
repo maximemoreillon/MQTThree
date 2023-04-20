@@ -21,7 +21,9 @@ export default defineEventHandler(async (event) => {
   if (!model) throw "Model not provided"
 
   const { filepath } = model
-  const newPath = `${path.join("public", "model", "model")}`
+  const configPath = path.resolve("public/config")
+  console.log(configPath)
+  const newPath = path.join(configPath, "model")
   fs.copyFileSync(filepath, newPath)
 
   return "Yes"

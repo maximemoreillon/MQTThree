@@ -92,7 +92,7 @@ class ThreejsApp {
 
   loadModel = () => {
     new GLTFLoader().load(
-      "/model/model",
+      "/config/model",
       (gltf: any) => {
         this.scene.add(gltf.scene)
       },

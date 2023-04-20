@@ -21,7 +21,9 @@ export default defineEventHandler(async (event) => {
   if (!config) throw "Config file not provided"
 
   const { filepath } = config
-  const newPath = `${path.join("public", "config", "config.yml")}`
+  const configPath = path.resolve("public/config")
+  console.log(configPath)
+  const newPath = path.join(configPath, "config.yml")
   fs.copyFileSync(filepath, newPath)
 
   return "Yes"
