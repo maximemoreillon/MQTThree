@@ -4,5 +4,4 @@ COPY ./ .
 RUN npm install
 RUN npm run build
 EXPOSE 3000
-WORKDIR /app/.output
-CMD node ./server/index.mjs
+CMD node .output/server/index.mjs

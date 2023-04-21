@@ -36,7 +36,7 @@ spec:
             - name: NUXT_PUBLIC_USE_SSL
               value: "true"
           volumeMounts:
-            - mountPath: /app/.output/config
+            - mountPath: /app/config
               name: ${APPLICATION_NAME}
       volumes:
         - name: ${APPLICATION_NAME}
