@@ -10,13 +10,17 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import Light from "./Light"
 import Sensor from "./Sensor"
 
+import DebugPlane from "./DebugPlane"
+
 class ThreejsApp {
   mqttClient: MQTT.Client
+
   scene: THREE.Scene
   renderer: THREE.WebGLRenderer
   camera: THREE.PerspectiveCamera
-  raycaster: THREE.Raycaster
   controls: OrbitControls
+
+  raycaster: THREE.Raycaster
 
   devices: (Light | Sensor)[]
 
@@ -25,6 +29,8 @@ class ThreejsApp {
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color("#444444")
     this.renderer = new THREE.WebGLRenderer({ canvas })
+
+    // TODO: raycaster could in in another object
     this.raycaster = new THREE.Raycaster()
 
     const { innerWidth: width, innerHeight: height } = window
@@ -45,9 +51,13 @@ class ThreejsApp {
     this.animate()
 
     window.addEventListener("resize", this.onWindowResized, false)
+
+    // Raycaster stuff
     this.renderer.domElement.addEventListener("click", this.onRendererClicked)
 
     mqttClient.onMessageArrived = this.onMqttMessageArrived
+
+    // new DebugPlane(this)
   }
 
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
@@ -131,8 +141,8 @@ class ThreejsApp {
       .map((d) => d.mesh)
 
     const [intersect] = this.raycaster.intersectObjects(objects, true)
+    if (!intersect) return
 
-    // No need to do a
     const foundDevice: any = this.devices.find(
       ({ mesh }: any) => mesh === intersect.object
     )
