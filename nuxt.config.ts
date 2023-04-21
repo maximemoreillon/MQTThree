@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     public: {
       mqttHost: "",
       mqttPort: "",
+      mqttUseSsl: false,
     },
   },
   build: {

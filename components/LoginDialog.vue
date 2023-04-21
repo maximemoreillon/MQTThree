@@ -32,6 +32,8 @@
 
 <script setup>
 const mqtt = useMqtt()
+const runtimeConfig = useRuntimeConfig()
+const { mqttUseSsl } = runtimeConfig.public
 
 const visible = ref(true)
 const username = ref("")
@@ -66,7 +68,7 @@ const connect = () => {
     onFailure,
     userName: username,
     password: password,
-    useSSL: true,
+    useSSL: !!mqttUseSsl,
     keepAliveInterval: 30,
     reconnect: true,
   })

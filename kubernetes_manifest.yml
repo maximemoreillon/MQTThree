@@ -33,6 +33,8 @@ spec:
               value: mqtt.home.maximemoreillon.com
             - name: NUXT_PUBLIC_MQTT_PORT
               value: "443"
+            - name: NUXT_PUBLIC_USE_SSL
+              value: "true"
           volumeMounts:
             - mountPath: /app/.output/config
               name: ${APPLICATION_NAME}
