@@ -20,7 +20,7 @@ class ThreejsApp {
 
   devices: (Light | Sensor)[]
 
-  constructor(canvas: HTMLElement, mqttClient: MQTT.Client) {
+  constructor({ canvas, mqttClient, ambientLightIntensity }: any) {
     this.mqttClient = mqttClient
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color("#444444")
@@ -32,7 +32,10 @@ class ThreejsApp {
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
     this.camera.position.set(5, 5, 5)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2)
+    const ambientLight = new THREE.AmbientLight(
+      0xffffff,
+      Number(ambientLightIntensity)
+    )
     this.scene.add(ambientLight)
 
     this.devices = []

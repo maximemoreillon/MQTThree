@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid"
 // Needs to be created here because if done in utils, getting a Nuxt instance not found or MQTT not supported in this browser
 const mqtt = useMqtt()
 const runtimeConfig = useRuntimeConfig()
-const { mqttHost, mqttPort } = runtimeConfig.public
+const { mqttHost, mqttPort, ambientLightIntensity } = runtimeConfig.public
 mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
 
 const canvas = ref()
@@ -21,6 +21,10 @@ mqtt.value.onConnected = () => {
   const { innerWidth: width, innerHeight: height } = window
   canvas.value.width = width
   canvas.value.height = height
-  new ThreejsApp(canvas.value, mqtt.value)
+  new ThreejsApp({
+    canvas: canvas.value,
+    mqttClient: mqtt.value,
+    ambientLightIntensity,
+  })
 }
 </script>
