@@ -96,10 +96,9 @@ class ThreejsApp {
       // called while loading is progressing
       (xhr: any) => {
         // TODO: show in a dialog
-        // PROBLEM: no access to the Vue app anymore
+        // PROBLEM: no easy access to the vue app here
         // console.log((xhr.loaded / xhr.total) * 100 + "% loaded")
       },
-      // called when loading has errors
       (error: any) => {
         console.error(error)
       }
@@ -127,13 +126,15 @@ class ThreejsApp {
     this.raycaster.setFromCamera(pointer, this.camera)
 
     // calculate objects intersecting the picking ray
-    const intersects = this.raycaster.intersectObjects(
-      this.scene.children,
-      true
-    )
+    const objects = this.devices
+      .filter((d): d is Light => d instanceof Light)
+      .map((d) => d.mesh)
 
-    const foundDevice: any = this.devices.find(({ mesh }: any) =>
-      intersects.find(({ object }) => mesh === object)
+    const [intersect] = this.raycaster.intersectObjects(objects, true)
+
+    // No need to do a
+    const foundDevice: any = this.devices.find(
+      ({ mesh }: any) => mesh === intersect.object
     )
 
     if (!foundDevice) return
