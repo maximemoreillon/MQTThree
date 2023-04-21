@@ -20,6 +20,9 @@ class ThreejsApp {
   camera: THREE.PerspectiveCamera
   controls: OrbitControls
 
+  gridHelper: THREE.GridHelper
+  axesHelper: THREE.AxesHelper
+
   raycaster: THREE.Raycaster
 
   devices: (Light | Sensor)[]
@@ -47,7 +50,7 @@ class ThreejsApp {
     this.devices = []
 
     this.loadModel()
-    this.getDevicesFromYaml()
+
     this.animate()
 
     window.addEventListener("resize", this.onWindowResized, false)
@@ -58,6 +61,25 @@ class ThreejsApp {
     mqttClient.onMessageArrived = this.onMqttMessageArrived
 
     // new DebugPlane(this)
+
+    // Grid helper
+    // TODO: connect to settings
+    const size = 10
+    const divisions = 10
+    this.gridHelper = new THREE.GridHelper(
+      size,
+      divisions,
+      new THREE.Color("#dddddd")
+    )
+    this.axesHelper = new THREE.AxesHelper(5)
+  }
+
+  toggleGrid = () => {
+    if (this.gridHelper.parent) this.gridHelper.removeFromParent()
+    else this.scene.add(this.gridHelper)
+
+    if (this.axesHelper.parent) this.axesHelper.removeFromParent()
+    else this.scene.add(this.axesHelper)
   }
 
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
@@ -102,6 +124,8 @@ class ThreejsApp {
       "/api/model",
       (gltf: any) => {
         this.scene.add(gltf.scene)
+        this.onModelLoaded()
+        this.getDevicesFromYaml()
       },
       // called while loading is progressing
       (xhr: any) => {
@@ -113,6 +137,10 @@ class ThreejsApp {
         console.error(error)
       }
     )
+  }
+
+  onModelLoaded = () => {
+    // Nothing as overridden
   }
 
   onWindowResized = () => {

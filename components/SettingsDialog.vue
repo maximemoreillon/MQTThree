@@ -6,13 +6,20 @@
         color="primary"
         v-bind="props"
         position="absolute"
-        icon="mdi-upload"
+        icon="mdi-cogs"
       />
     </template>
 
     <v-card>
-      <v-card-title> Model / config upload </v-card-title>
+      <v-card-title> Settings </v-card-title>
       <v-card-text>
+        <v-row>
+          <v-col cols="auto">
+            <v-btn @click="threejsApp.toggleGrid()" prepend-icon="mdi-grid"
+              >Toggle grid</v-btn
+            >
+          </v-col>
+        </v-row>
         <model-upload />
         <config-upload />
       </v-card-text>
@@ -24,10 +31,7 @@
   </v-dialog>
 </template>
 
-<script setup type="ts">
-
-import axios from 'axios'
-
-
+<script setup lang="ts">
 const dialog = ref(false)
+const threejsApp = useThreejsApp()
 </script>

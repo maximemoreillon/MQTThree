@@ -4,17 +4,13 @@
       <v-file-input label="Model" v-model="file" accept=".gltf,.glb" />
     </v-col>
     <v-col cols="auto">
-      <v-btn @click="upload()" prepend-icon="mdi-upload" :loading="loading">
-        Upload
-      </v-btn>
+      <v-btn @click="upload()" icon="mdi-upload" :loading="loading" />
     </v-col>
   </v-row>
 </template>
 
-<script setup type="ts">
-
-import axios from 'axios'
-
+<script setup lang="ts">
+import axios from "axios"
 
 const file = ref()
 const loading = ref(false)
@@ -34,6 +30,5 @@ const upload = async () => {
   } finally {
     loading.value = false
   }
-
 }
 </script>

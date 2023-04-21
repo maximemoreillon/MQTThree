@@ -30,7 +30,7 @@
   </v-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const mqtt = useMqtt()
 const runtimeConfig = useRuntimeConfig()
 const { mqttUseSsl } = runtimeConfig.public
