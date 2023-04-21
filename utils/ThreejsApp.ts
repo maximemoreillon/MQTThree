@@ -14,7 +14,7 @@ class ThreejsApp {
   mqttClient: MQTT.Client
   scene: THREE.Scene
   renderer: THREE.WebGLRenderer
-  camera: THREE.Camera
+  camera: THREE.PerspectiveCamera
   raycaster: THREE.Raycaster
   controls: OrbitControls
 
@@ -108,9 +108,7 @@ class ThreejsApp {
     const { innerWidth: width, innerHeight: height } = window
     this.renderer.domElement.width = width
     this.renderer.domElement.height = height
-    // @ts-ignore
     this.camera.aspect = width / height
-    // @ts-ignore
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(width, height)
   }
