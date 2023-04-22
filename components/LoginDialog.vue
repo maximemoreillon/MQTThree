@@ -65,23 +65,25 @@ const connect = () => {
   }
   const { username, password } = JSON.parse(localStorageContent)
 
-  setTimeout(() => {
-    mqtt.value.connect({
-      onSuccess,
-      onFailure,
-      userName: username,
-      password: password,
-      useSSL: !!mqttUseSsl,
-      keepAliveInterval: 30,
-      reconnect: true,
-    })
-  }, 3000)
+  mqtt.value.connect({
+    onSuccess,
+    onFailure,
+    userName: username,
+    password: password,
+    useSSL: !!mqttUseSsl,
+    keepAliveInterval: 30,
+    reconnect: true,
+  })
 }
+
 const onSuccess = () => {
+  // NOTE: This also gets called when reconnecting
   loading.value = false
   visible.value = false
 }
-const onFailure = () => {
+const onFailure = (error: any) => {
+  console.error(error)
   loading.value = false
+  // TODO: snackbar?
 }
 </script>

@@ -17,19 +17,29 @@ const threejsApp = useThreejsApp()
 
 const runtimeConfig = useRuntimeConfig()
 const { mqttHost, mqttPort, ambientLightIntensity } = runtimeConfig.public
+
+console.log(`Creating an MQTT client with host ${mqttHost}`)
 mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
 
 const canvas = ref()
 
-// Maybe not ideal: This will recreate the whole ThreeJs app at each connection
-mqtt.value.onConnected = () => {
+onMounted(() => {
   const { innerWidth: width, innerHeight: height } = window
   canvas.value.width = width
   canvas.value.height = height
-  threejsApp.value = new ThreejsApp({
-    canvas: canvas.value,
-    mqttClient: mqtt.value,
-    ambientLightIntensity,
-  })
+})
+
+mqtt.value.onConnected = (reconnect: boolean) => {
+  console.log("MQTT onConnected event")
+
+  if (!reconnect && !threejsApp.value)
+    threejsApp.value = new ThreejsApp({
+      canvas: canvas.value,
+      mqttClient: mqtt.value,
+    })
+}
+
+mqtt.value.onConnectionLost = () => {
+  console.log("MQTT disconnected")
 }
 </script>

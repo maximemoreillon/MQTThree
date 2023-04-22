@@ -19,13 +19,12 @@ const dialog = ref(false)
 const threejsApp = useThreejsApp()
 
 watch(threejsApp, () => {
-  if (threejsApp.value) {
-    threejsApp.value.onModelLoadStart = () => {
-      dialog.value = true
-    }
-    threejsApp.value.onModelLoadEnd = () => {
-      dialog.value = false
-    }
+  if (!threejsApp.value) return
+
+  dialog.value = true
+
+  threejsApp.value.onModelLoaded = () => {
+    dialog.value = false
   }
 })
 </script>

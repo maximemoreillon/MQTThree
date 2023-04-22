@@ -53,7 +53,7 @@ class ThreejsApp {
     // Raycaster stuff
     this.renderer.domElement.addEventListener("click", this.onRendererClicked)
 
-    mqttClient.onConnected = this.onMqttConnected
+    // Respond handle MQTT messages
     mqttClient.onMessageArrived = this.onMqttMessageArrived
 
     this.loadModel()
@@ -75,18 +75,12 @@ class ThreejsApp {
     else this.scene.add(this.axesHelper)
   }
 
-  onMqttConnected = () => {
-    // Problem: might not have devices yet
-    // Could get the devices here
-    // Problem, will re-add devices on reconnection
-  }
-
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
+    const foundDevice: any = this.devices.find(
+      (device: any) => device.topic === topic
+    )
+    if (!foundDevice) return
     try {
-      const foundDevice: any = this.devices.find(
-        (device: any) => device.topic === topic
-      )
-      if (!foundDevice) return
       const payloadJson = JSON.parse(payloadString)
       foundDevice.stateUpdate(payloadJson)
     } catch (error) {
@@ -116,7 +110,6 @@ class ThreejsApp {
         })
         .filter((d: any) => d)
 
-      // TODO: ambientLight should depend on whether there are lights in the scene
       const ambientLightIntensity = this.devices.some(
         (d): d is Light => d instanceof Light
       )
@@ -134,33 +127,27 @@ class ThreejsApp {
   }
 
   loadModel = () => {
-    this.onModelLoadStart()
     new GLTFLoader().load(
       "/api/model",
       (gltf: any) => {
         this.scene.add(gltf.scene)
-        this.onModelLoadEnd()
+        this.onModelLoaded()
       },
-      // called while loading is progressing
-      (xhr: any) => {
-        // TODO: show in a dialog
-        // PROBLEM: no easy access to the vue app here
-        // console.log((xhr.loaded / xhr.total) * 100 + "% loaded")
-      },
+      this.onModelLoading,
       (error: any) => {
         console.error(error)
         // TODO: have a
-        this.onModelLoadEnd()
+        this.onModelLoaded()
       }
     )
   }
 
-  onModelLoadStart = () => {
+  onModelLoading = (xhr: any) => {
     // Nothing as overridden
     // TODO: does not feel like the right option
   }
 
-  onModelLoadEnd = () => {
+  onModelLoaded = () => {
     // Nothing as overridden
     // TODO: does not feel like the right option
   }

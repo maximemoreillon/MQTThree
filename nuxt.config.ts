@@ -6,7 +6,6 @@ export default defineNuxtConfig({
       mqttHost: "",
       mqttPort: "",
       mqttUseSsl: false,
-      ambientLightIntensity: 0.2,
     },
   },
   build: {
