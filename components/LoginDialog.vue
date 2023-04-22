@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-const mqtt = useMqtt()
+const mqttClient = useMqttClient()
 const runtimeConfig = useRuntimeConfig()
 const { mqttUseSsl } = runtimeConfig.public
 
@@ -41,7 +41,7 @@ const password = ref("")
 const loading = ref(false)
 
 onMounted(() => {
-  if (!mqtt.value.isConnected()) connect()
+  if (!mqttClient.value.isConnected()) connect()
   else visible.value = false
 })
 
@@ -65,7 +65,7 @@ const connect = () => {
   }
   const { username, password } = JSON.parse(localStorageContent)
 
-  mqtt.value.connect({
+  mqttClient.value.connect({
     onSuccess,
     onFailure,
     userName: username,

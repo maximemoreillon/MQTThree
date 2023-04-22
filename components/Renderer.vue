@@ -1,6 +1,7 @@
 <template>
   <LoginDialog />
   <SettingsDialog />
+  <MqttReconnectingDialog />
   <ModelLoadingDialog />
   <canvas ref="canvas" />
 </template>
@@ -12,14 +13,15 @@ import { v4 as uuidv4 } from "uuid"
 
 // Create the MQTT client
 // Needs to be created here because if done in utils, getting a Nuxt instance not found or MQTT not supported in this browser
-const mqtt = useMqtt()
+const mqttClient = useMqttClient()
+const mqttReconnecting = useMqttReconnecting()
 const threejsApp = useThreejsApp()
 
 const runtimeConfig = useRuntimeConfig()
 const { mqttHost, mqttPort, ambientLightIntensity } = runtimeConfig.public
 
 console.log(`Creating an MQTT client with host ${mqttHost}`)
-mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
+mqttClient.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
 
 const canvas = ref()
 
@@ -29,17 +31,20 @@ onMounted(() => {
   canvas.value.height = height
 })
 
-mqtt.value.onConnected = (reconnect: boolean) => {
+mqttClient.value.onConnected = (reconnect: boolean) => {
   console.log("MQTT onConnected event")
+
+  if (reconnect) mqttReconnecting.value = false
 
   if (!reconnect && !threejsApp.value)
     threejsApp.value = new ThreejsApp({
       canvas: canvas.value,
-      mqttClient: mqtt.value,
+      mqttClient: mqttClient.value,
     })
 }
 
-mqtt.value.onConnectionLost = () => {
+mqttClient.value.onConnectionLost = () => {
   console.log("MQTT disconnected")
+  mqttReconnecting.value = true
 }
 </script>
