@@ -15,9 +15,13 @@
       <v-card-text>
         <v-row>
           <v-col cols="auto">
-            <v-btn @click="threejsApp.toggleGrid()" prepend-icon="mdi-grid"
-              >Toggle grid</v-btn
+            <v-btn
+              @click="threejsApp.toggleGrid()"
+              prepend-icon="mdi-grid"
+              variant="text"
             >
+              Toggle grid
+            </v-btn>
           </v-col>
         </v-row>
         <model-upload />
