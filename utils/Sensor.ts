@@ -27,10 +27,6 @@ class Sensor extends Device {
     this.scene.add(sprite)
   }
 
-  onClicked() {
-    console.log("Sensor clicked")
-  }
-
   generateTextureMapWithText(text: string) {
     //create image
     const canvas = document.createElement("canvas")
@@ -62,7 +58,7 @@ class Sensor extends Device {
     return new THREE.TextureLoader().load(imageUrl)
   }
 
-  stateUpdate(payload: any): void {
+  stateUpdate = (payload: any): void => {
     const value = Math.round(payload[this.key])
     this.spriteMaterial.map = this.generateTextureMapWithText(
       `${value} ${this.unit}`

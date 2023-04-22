@@ -54,6 +54,7 @@ const login = () => {
   connect()
 }
 
+// Starting to believe here is not the right place for connect
 const connect = () => {
   loading.value = true
   const localStorageContent = localStorage.getItem("mqtt")
@@ -63,15 +64,18 @@ const connect = () => {
     return
   }
   const { username, password } = JSON.parse(localStorageContent)
-  mqtt.value.connect({
-    onSuccess,
-    onFailure,
-    userName: username,
-    password: password,
-    useSSL: !!mqttUseSsl,
-    keepAliveInterval: 30,
-    reconnect: true,
-  })
+
+  setTimeout(() => {
+    mqtt.value.connect({
+      onSuccess,
+      onFailure,
+      userName: username,
+      password: password,
+      useSSL: !!mqttUseSsl,
+      keepAliveInterval: 30,
+      reconnect: true,
+    })
+  }, 3000)
 }
 const onSuccess = () => {
   loading.value = false

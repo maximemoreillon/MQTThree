@@ -14,10 +14,18 @@
 </template>
 
 <script setup lang="ts">
-const dialog = ref(true)
+const dialog = ref(false)
 
 const threejsApp = useThreejsApp()
-threejsApp.value.onModelLoaded = () => {
-  dialog.value = false
-}
+
+watch(threejsApp, () => {
+  if (threejsApp.value) {
+    threejsApp.value.onModelLoadStart = () => {
+      dialog.value = true
+    }
+    threejsApp.value.onModelLoadEnd = () => {
+      dialog.value = false
+    }
+  }
+})
 </script>

@@ -13,6 +13,7 @@ import Sensor from "./Sensor"
 import DebugPlane from "./DebugPlane"
 
 class ThreejsApp {
+  // TODO: consider a MQTT Handler class
   mqttClient: MQTT.Client
 
   scene: THREE.Scene
@@ -27,29 +28,23 @@ class ThreejsApp {
 
   devices: (Light | Sensor)[]
 
-  constructor({ canvas, mqttClient, ambientLightIntensity }: any) {
+  constructor({ canvas, mqttClient }: any) {
+    const { innerWidth: width, innerHeight: height } = window
+
     this.mqttClient = mqttClient
+
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color("#444444")
     this.renderer = new THREE.WebGLRenderer({ canvas })
 
-    // TODO: raycaster could in in another object
+    // TODO: Find better way to deal with raycaster
     this.raycaster = new THREE.Raycaster()
-
-    const { innerWidth: width, innerHeight: height } = window
 
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
     this.camera.position.set(5, 5, 5)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-    const ambientLight = new THREE.AmbientLight(
-      0xffffff,
-      Number(ambientLightIntensity)
-    )
-    this.scene.add(ambientLight)
 
     this.devices = []
-
-    this.loadModel()
 
     this.animate()
 
@@ -58,19 +53,17 @@ class ThreejsApp {
     // Raycaster stuff
     this.renderer.domElement.addEventListener("click", this.onRendererClicked)
 
+    mqttClient.onConnected = this.onMqttConnected
     mqttClient.onMessageArrived = this.onMqttMessageArrived
 
-    // new DebugPlane(this)
+    this.loadModel()
+    this.getDevicesFromYaml()
 
     // Grid helper
     // TODO: connect to settings
     const size = 10
     const divisions = 10
-    this.gridHelper = new THREE.GridHelper(
-      size,
-      divisions,
-      new THREE.Color("#dddddd")
-    )
+    this.gridHelper = new THREE.GridHelper(size, divisions)
     this.axesHelper = new THREE.AxesHelper(5)
   }
 
@@ -80,6 +73,12 @@ class ThreejsApp {
 
     if (this.axesHelper.parent) this.axesHelper.removeFromParent()
     else this.scene.add(this.axesHelper)
+  }
+
+  onMqttConnected = () => {
+    // Problem: might not have devices yet
+    // Could get the devices here
+    // Problem, will re-add devices on reconnection
   }
 
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
@@ -100,32 +99,47 @@ class ThreejsApp {
       const response = await fetch("/api/config")
       const data = await response.text()
 
-      this.devices = YAML.parse(data).map(({ type, ...properties }: any) => {
-        if (type === "light")
-          return new Light({
-            ...properties,
-            mqttClient: this.mqttClient,
-            scene: this.scene,
-          })
-        else if (type === "sensor")
-          return new Sensor({
-            ...properties,
-            mqttClient: this.mqttClient,
-            scene: this.scene,
-          })
-      })
+      this.devices = YAML.parse(data)
+        .map(({ type, ...properties }: any) => {
+          if (type === "light")
+            return new Light({
+              ...properties,
+              mqttClient: this.mqttClient,
+              scene: this.scene,
+            })
+          else if (type === "sensor")
+            return new Sensor({
+              ...properties,
+              mqttClient: this.mqttClient,
+              scene: this.scene,
+            })
+        })
+        .filter((d: any) => d)
+
+      // TODO: ambientLight should depend on whether there are lights in the scene
+      const ambientLightIntensity = this.devices.some(
+        (d): d is Light => d instanceof Light
+      )
+        ? 0.3
+        : 1
+
+      const ambientLight = new THREE.AmbientLight(
+        0xffffff,
+        ambientLightIntensity
+      )
+      this.scene.add(ambientLight)
     } catch (error) {
-      console.warn("Config file not found or invalid")
+      console.error(error)
     }
   }
 
   loadModel = () => {
+    this.onModelLoadStart()
     new GLTFLoader().load(
       "/api/model",
       (gltf: any) => {
         this.scene.add(gltf.scene)
-        this.onModelLoaded()
-        this.getDevicesFromYaml()
+        this.onModelLoadEnd()
       },
       // called while loading is progressing
       (xhr: any) => {
@@ -135,12 +149,20 @@ class ThreejsApp {
       },
       (error: any) => {
         console.error(error)
+        // TODO: have a
+        this.onModelLoadEnd()
       }
     )
   }
 
-  onModelLoaded = () => {
+  onModelLoadStart = () => {
     // Nothing as overridden
+    // TODO: does not feel like the right option
+  }
+
+  onModelLoadEnd = () => {
+    // Nothing as overridden
+    // TODO: does not feel like the right option
   }
 
   onWindowResized = () => {

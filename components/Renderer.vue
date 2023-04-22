@@ -1,7 +1,7 @@
 <template>
   <LoginDialog />
   <SettingsDialog />
-  <ModelLoadingDialog v-if="threejsApp" />
+  <ModelLoadingDialog />
   <canvas ref="canvas" />
 </template>
 
@@ -21,6 +21,7 @@ mqtt.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
 
 const canvas = ref()
 
+// Maybe not ideal: This will recreate the whole ThreeJs app at each connection
 mqtt.value.onConnected = () => {
   const { innerWidth: width, innerHeight: height } = window
   canvas.value.width = width

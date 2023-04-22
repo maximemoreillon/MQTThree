@@ -37,7 +37,7 @@ class Light extends Device {
     this.state = "unknown"
   }
 
-  onClicked() {
+  onClicked = () => {
     // TODO: would be simpler with just "toggle" as this.state would not be needed
     const state = this.state === "on" ? "off" : "on"
     const message = new MQTT.Message(JSON.stringify({ state }))
@@ -45,7 +45,7 @@ class Light extends Device {
     this.mqttClient.send(message)
   }
 
-  stateUpdate({ state }: any): void {
+  stateUpdate = ({ state }: any): void => {
     this.state = state.toLowerCase()
     if (this.state === "off") {
       this.light.intensity = 0
