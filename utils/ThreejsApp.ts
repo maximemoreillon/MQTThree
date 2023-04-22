@@ -51,7 +51,7 @@ class ThreejsApp {
     window.addEventListener("resize", this.onWindowResized, false)
 
     // Raycaster stuff
-    this.renderer.domElement.addEventListener("click", this.onRendererClicked)
+    this.renderer.domElement.addEventListener("click", this.onClicked)
 
     // Respond handle MQTT messages
     mqttClient.onMessageArrived = this.onMqttMessageArrived
@@ -73,6 +73,18 @@ class ThreejsApp {
 
     if (this.axesHelper.parent) this.axesHelper.removeFromParent()
     else this.scene.add(this.axesHelper)
+  }
+
+  toggle3d = () => {
+    if (this.controls.enableRotate) {
+      this.controls.saveState()
+      this.controls.enableRotate = false
+      this.camera.position.set(0, 10, 0)
+      this.camera.lookAt(0, 0, 0)
+    } else {
+      this.controls.enableRotate = true
+      this.controls.reset()
+    }
   }
 
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
@@ -162,7 +174,7 @@ class ThreejsApp {
     this.renderer.setSize(width, height)
   }
 
-  onRendererClicked = ({ clientX, clientY }: any) => {
+  onClicked = ({ clientX, clientY }: any) => {
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
 

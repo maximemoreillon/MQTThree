@@ -23,6 +23,15 @@
               Toggle grid
             </v-btn>
           </v-col>
+          <v-col cols="auto">
+            <v-btn
+              @click="threejsApp.toggle3d()"
+              prepend-icon="mdi-rotate-3d"
+              variant="text"
+            >
+              Toggle 3D
+            </v-btn>
+          </v-col>
         </v-row>
         <model-upload />
         <config-upload />
