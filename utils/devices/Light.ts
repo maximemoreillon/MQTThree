@@ -12,9 +12,11 @@ interface Params {
 }
 
 class Light extends Device {
+  group: THREE.Group
   light: THREE.PointLight
-  mesh: THREE.Mesh
-  material: THREE.MeshBasicMaterial
+  hitbox: THREE.Mesh
+  model: THREE.Mesh
+  // material: THREE.MeshBasicMaterial
   state: string
   params: Params
 
@@ -24,22 +26,26 @@ class Light extends Device {
     this.params = params
     const { x, y, z } = this.params.position
 
+    this.group = new THREE.Group()
+    this.group.position.set(x, y, z)
+    this.app.scene.add(this.group)
+
+    this.model = new THREE.Mesh()
     const geometry = new THREE.SphereGeometry(0.15, 100, 100)
-    this.material = new THREE.MeshBasicMaterial({ color: "#444444" })
-    this.mesh = new THREE.Mesh(geometry, this.material)
-    this.mesh.position.set(x, y, z)
+    this.hitbox = new THREE.Mesh(geometry)
+    this.hitbox.visible = false
+
+    this.group.add(this.hitbox)
 
     this.light = new THREE.PointLight(0xffffff, 0, 100, 20)
     this.light.castShadow = true
-    this.light.position.set(x, y, z)
 
     // TODO: consider a dedicated method so as to benefit from inheritence
-    this.app.scene.add(this.mesh)
-    this.app.scene.add(this.light)
+    this.group.add(this.light)
 
     this.state = "unknown"
 
-    // this.loadModel()
+    this.loadModel()
   }
 
   loadModel = () => {
@@ -53,11 +59,14 @@ class Light extends Device {
   }
 
   onModelLoaded = (model: any) => {
-    const { x, y, z } = this.params.position
-    this.mesh = model.scene
-    this.mesh.scale.set(0.02, 0.02, 0.02)
-    this.app.scene.add(this.mesh)
-    this.mesh.position.set(x, y, z)
+    this.model = model.scene
+    this.model.castShadow = false
+    this.model.receiveShadow = false
+    const scale = 0.01
+    this.model.scale.set(scale, scale, scale)
+    this.model.position.z += scale * 24
+    this.group.add(this.model)
+    this.updateRepresentation()
   }
 
   onModelLoading = (xhr: any) => {
@@ -69,21 +78,29 @@ class Light extends Device {
   }
 
   onClicked = () => {
-    console.log("Clicked")
     // would be simpler with just "toggle" as this.state would not be needed
     const state = this.state === "on" ? "off" : "on"
     const message = new MQTT.Message(JSON.stringify({ state }))
     message.destinationName = this.params.commandTopic
     this.app.mqttClient.send(message)
+    this.model.material
   }
 
   stateUpdate = ({ state }: any): void => {
     this.state = state.toLowerCase()
+    this.updateRepresentation()
+  }
+
+  updateRepresentation() {
     if (this.state === "off") {
       this.light.intensity = 0
-      this.material.color.set("#5c5400")
+      this.model.traverse(({ material }: any) => {
+        if (material) material.color.set("#444444")
+      })
     } else if (this.state === "on") {
-      this.material.color.set("#ffea00")
+      this.model.traverse(({ material }: any) => {
+        if (material) material.color.set("#ffff00")
+      })
       this.light.intensity = 1
     }
   }

@@ -15,8 +15,7 @@ export default defineEventHandler(async (event) => {
 
   const { filepath } = config
   const newPath = path.join(configPath, "config.yml")
-  console.log(newPath)
   fs.copyFileSync(filepath, newPath)
 
-  return "Yes"
+  return "OK"
 })

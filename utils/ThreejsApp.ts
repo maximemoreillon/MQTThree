@@ -165,27 +165,22 @@ class ThreejsApp {
   }
 
   onClicked = ({ clientX, clientY }: any) => {
-    // calculate pointer position in normalized device coordinates
-    // (-1 to +1) for both components
-
     const pointer = new THREE.Vector2()
     pointer.x = (clientX / window.innerWidth) * 2 - 1
     pointer.y = -(clientY / window.innerHeight) * 2 + 1
 
     this.raycaster.setFromCamera(pointer, this.camera)
 
-    // calculate objects intersecting the picking ray
-
     const objects = this.devices
       .filter((d): d is Light => d instanceof Light)
-      .map((d) => d.mesh)
+      .map((d) => d.hitbox)
 
-    const intersects = this.raycaster.intersectObjects(objects, true)
+    const intersects = this.raycaster.intersectObjects(objects, false)
 
     if (!intersects.length) return
 
-    const foundDevice: any = this.devices.find(({ mesh }: any) =>
-      intersects.find(({ object }) => mesh === object)
+    const foundDevice: any = this.devices.find(({ hitbox }: any) =>
+      intersects.find(({ object }) => hitbox === object)
     )
 
     if (foundDevice) foundDevice.onClicked()
