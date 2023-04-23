@@ -1,19 +1,20 @@
 import * as THREE from "three"
-import Device from "./Device"
+import Device from "../Device"
+import ThreejsApp from "../ThreejsApp"
 
 class Sensor extends Device {
   key: string
   unit: string
   spriteMaterial: THREE.SpriteMaterial
 
-  constructor(opts: any) {
+  constructor(app: ThreejsApp, opts: any) {
     const {
       position: { x = 0, y = 0, z = 0 },
       key,
       unit = "",
     } = opts
 
-    super(opts)
+    super(app, opts)
 
     this.key = key
     this.unit = unit
@@ -24,7 +25,7 @@ class Sensor extends Device {
 
     const sprite = new THREE.Sprite(this.spriteMaterial)
     sprite.position.set(x, y, z)
-    this.scene.add(sprite)
+    this.app.scene.add(sprite)
   }
 
   generateTextureMapWithText(text: string) {

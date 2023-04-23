@@ -7,8 +7,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 // @ts-ignore
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
-import Light from "./Light"
-import Sensor from "./Sensor"
+import Light from "./devices/Light"
+import Sensor from "./devices/Sensor"
 
 import DebugPlane from "./DebugPlane"
 
@@ -107,18 +107,8 @@ class ThreejsApp {
 
       this.devices = YAML.parse(data)
         .map(({ type, ...properties }: any) => {
-          if (type === "light")
-            return new Light({
-              ...properties,
-              mqttClient: this.mqttClient,
-              scene: this.scene,
-            })
-          else if (type === "sensor")
-            return new Sensor({
-              ...properties,
-              mqttClient: this.mqttClient,
-              scene: this.scene,
-            })
+          if (type === "light") return new Light(this, properties)
+          else if (type === "sensor") return new Sensor(this, properties)
         })
         .filter((d: any) => d)
 
@@ -185,19 +175,20 @@ class ThreejsApp {
     this.raycaster.setFromCamera(pointer, this.camera)
 
     // calculate objects intersecting the picking ray
+
     const objects = this.devices
       .filter((d): d is Light => d instanceof Light)
       .map((d) => d.mesh)
 
-    const [intersect] = this.raycaster.intersectObjects(objects, true)
-    if (!intersect) return
+    const intersects = this.raycaster.intersectObjects(objects, true)
 
-    const foundDevice: any = this.devices.find(
-      ({ mesh }: any) => mesh === intersect.object
+    if (!intersects.length) return
+
+    const foundDevice: any = this.devices.find(({ mesh }: any) =>
+      intersects.find(({ object }) => mesh === object)
     )
 
-    if (!foundDevice) return
-    foundDevice.onClicked()
+    if (foundDevice) foundDevice.onClicked()
   }
 
   animate = () => {

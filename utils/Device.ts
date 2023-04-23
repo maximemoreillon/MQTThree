@@ -1,30 +1,24 @@
 import * as THREE from "three"
 import type { Client } from "paho-mqtt"
-
+import ThreejsApp from "./ThreejsApp"
 // import { Message } from "paho-mqtt"
 // Nuxt instance not available
 // const mqtt = useMqtt()
 
 class Device {
+  app: ThreejsApp
+
   topic: string // TODO: consider if here or in children
-  scene: THREE.Scene
 
-  mqttClient: Client
+  // TODO: mqttClient as second parameter
+  constructor(app: ThreejsApp, opts: any) {
+    this.app = app
 
-  constructor(opts: any) {
-    const {
-      topic,
-      position: { x = 0, y = 0, z = 0 },
-      mqttClient,
-      scene,
-    } = opts
+    const { topic } = opts
 
     this.topic = topic
-    this.scene = scene
 
-    this.mqttClient = mqttClient
-    // Not ideal to MQTTT Subscribe here because MQTT might not be connected
-    mqttClient.subscribe(this.topic)
+    app.mqttClient.subscribe(this.topic)
   }
   stateUpdate = (newState: any) => {}
   onClicked = () => {}
