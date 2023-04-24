@@ -4,7 +4,16 @@ import ThreejsApp from "../ThreejsApp"
 import MQTT from "paho-mqtt"
 
 interface Params {
-  position: any
+  position: {
+    x: number
+    y: number
+    z: number
+  }
+  rotation?: {
+    x: number
+    y: number
+    z: number
+  }
   commandTopic: string
   payload?: {
     on: string
@@ -23,10 +32,14 @@ class ToggleableDevice extends Device {
     super(app, params)
 
     this.params = params
-    const { x, y, z } = this.params.position
+    const { position, rotation } = this.params
 
     this.group = new THREE.Group()
-    this.group.position.set(x, y, z)
+    this.group.position.set(position.x, position.y, position.z)
+    this.group.rotation.z = (Math.PI * (rotation?.z || 0)) / 180
+    this.group.rotation.y = (Math.PI * (rotation?.y || 0)) / 180
+    this.group.rotation.x = (Math.PI * (rotation?.x || 0)) / 180
+
     this.app.scene.add(this.group)
 
     this.model = new THREE.Mesh()
