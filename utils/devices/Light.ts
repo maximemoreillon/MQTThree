@@ -102,6 +102,11 @@ class Light extends Device {
         if (material) material.color.set("#ffff00")
       })
       this.light.intensity = 1
+    } else {
+      this.model.traverse(({ material }: any) => {
+        if (material) material.color.set("#c00000")
+      })
+      this.light.intensity = 0
     }
   }
 }
