@@ -1,11 +1,10 @@
-import * as THREE from "three"
-import Device from "../Device"
-import MQTT from "paho-mqtt"
+import ToggleableDevice from "./ToggleableDevice"
 import ThreejsApp from "../ThreejsApp"
 
 // @ts-ignore
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
+// this is quite rubbish
 interface Params {
   position: any
   commandTopic: string
@@ -15,33 +14,9 @@ interface Params {
   }
 }
 
-class Fan extends Device {
-  group: THREE.Group
-  hitbox: THREE.Mesh
-  model: THREE.Mesh
-  // material: THREE.MeshBasicMaterial
-  state: string
-  params: Params
-
+class Fan extends ToggleableDevice {
   constructor(app: ThreejsApp, params: Params) {
     super(app, params)
-
-    this.params = params
-    const { x, y, z } = this.params.position
-
-    this.group = new THREE.Group()
-    this.group.position.set(x, y, z)
-    this.app.scene.add(this.group)
-
-    this.model = new THREE.Mesh()
-    const geometry = new THREE.SphereGeometry(0.15, 100, 100)
-    this.hitbox = new THREE.Mesh(geometry)
-    this.hitbox.visible = false
-
-    this.group.add(this.hitbox)
-
-    this.state = "unknown"
-
     this.loadModel()
   }
 
@@ -63,6 +38,9 @@ class Fan extends Device {
     this.model.scale.set(scale, scale, scale)
     this.model.rotateY(0.5 * Math.PI)
     this.group.add(this.model)
+    this.model.traverse(({ material }: any) => {
+      if (material) material.color.set("#a5d1c0")
+    })
   }
 
   onModelLoading = (xhr: any) => {
@@ -71,24 +49,6 @@ class Fan extends Device {
 
   onModelError = (error: any) => {
     console.error(error)
-  }
-
-  onClicked = () => {
-    // would be simpler with just "toggle" as this.state would not be needed
-    const payload = {
-      off: this.params?.payload?.off || "off",
-      on: this.params?.payload?.on || "on",
-    }
-
-    const state = this.state === payload.on ? payload.off : payload.on
-    const message = new MQTT.Message(JSON.stringify({ state }))
-    message.destinationName = this.params.commandTopic
-    this.app.mqttClient.send(message)
-    this.model.material
-  }
-
-  stateUpdate = ({ state }: any): void => {
-    this.state = state.toLowerCase()
   }
 
   animate = () => {

@@ -10,7 +10,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import Light from "./devices/Light"
 import Sensor from "./devices/Sensor"
 import Fan from "./devices/Fan"
-
+import ToggleableDevice from "./devices/ToggleableDevice"
 class ThreejsApp {
   // TODO: consider a MQTT Handler class
   mqttClient: MQTT.Client
@@ -186,7 +186,7 @@ class ThreejsApp {
     this.raycaster.setFromCamera(pointer, this.camera)
 
     const objects = this.devices
-      .filter((d): d is Light => d instanceof Light || d instanceof Fan)
+      .filter((d): d is Light => d instanceof ToggleableDevice)
       .map((d) => d.hitbox)
 
     const intersects = this.raycaster.intersectObjects(objects, false)

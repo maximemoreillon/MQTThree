@@ -1,50 +1,28 @@
 import * as THREE from "three"
-import Device from "../Device"
-import MQTT from "paho-mqtt"
+import ToggleableDevice from "./ToggleableDevice"
 import ThreejsApp from "../ThreejsApp"
 
 // @ts-ignore
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
+// this is quite rubbish
 interface Params {
   position: any
   commandTopic: string
+  payload?: {
+    on: string
+    off: string
+  }
 }
 
-class Light extends Device {
-  group: THREE.Group
+class Light extends ToggleableDevice {
   light: THREE.PointLight
-  hitbox: THREE.Mesh
-  model: THREE.Mesh
-  // material: THREE.MeshBasicMaterial
-  state: string
-  params: Params
 
   constructor(app: ThreejsApp, params: Params) {
     super(app, params)
-
-    this.params = params
-    const { x, y, z } = this.params.position
-
-    this.group = new THREE.Group()
-    this.group.position.set(x, y, z)
-    this.app.scene.add(this.group)
-
-    this.model = new THREE.Mesh()
-    const geometry = new THREE.SphereGeometry(0.15, 100, 100)
-    this.hitbox = new THREE.Mesh(geometry)
-    this.hitbox.visible = false
-
-    this.group.add(this.hitbox)
-
     this.light = new THREE.PointLight(0xffffff, 0, 100, 20)
     this.light.castShadow = true
-
-    // TODO: consider a dedicated method so as to benefit from inheritence
     this.group.add(this.light)
-
-    this.state = "unknown"
-
     this.loadModel()
   }
 
@@ -75,15 +53,6 @@ class Light extends Device {
 
   onModelError = (error: any) => {
     console.error(error)
-  }
-
-  onClicked = () => {
-    // would be simpler with just "toggle" as this.state would not be needed
-    const state = this.state === "on" ? "off" : "on"
-    const message = new MQTT.Message(JSON.stringify({ state }))
-    message.destinationName = this.params.commandTopic
-    this.app.mqttClient.send(message)
-    this.model.material
   }
 
   stateUpdate = ({ state }: any): void => {
