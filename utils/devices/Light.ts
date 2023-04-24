@@ -95,7 +95,7 @@ class Light extends Device {
     if (this.state === "off") {
       this.light.intensity = 0
       this.model.traverse(({ material }: any) => {
-        if (material) material.color.set("#444444")
+        if (material) material.color.set("#222222")
       })
     } else if (this.state === "on") {
       this.model.traverse(({ material }: any) => {

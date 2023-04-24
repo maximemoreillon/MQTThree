@@ -50,11 +50,24 @@ class ThreejsApp {
 
     window.addEventListener("resize", this.onWindowResized, false)
 
-    // Raycaster stuff
-    this.renderer.domElement.addEventListener("click", this.onClicked)
-
     // Respond handle MQTT messages
     mqttClient.onMessageArrived = this.onMqttMessageArrived
+
+    // Raycaster to click items
+    this.renderer.domElement.addEventListener("click", this.onClicked)
+
+    // Disabling click events when orbitcontrols are in use
+    this.controls.addEventListener("start", () => {
+      setTimeout(() => {
+        this.renderer.domElement.removeEventListener("click", this.onClicked)
+      }, 500)
+    })
+
+    this.controls.addEventListener("end", () => {
+      setTimeout(() => {
+        this.renderer.domElement.addEventListener("click", this.onClicked)
+      }, 500)
+    })
 
     this.loadModel()
     this.getDevicesFromYaml()
