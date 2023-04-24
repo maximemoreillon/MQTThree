@@ -22,6 +22,7 @@ class Device {
   }
   stateUpdate = (newState: any) => {}
   onClicked = () => {}
+  animate = () => {}
 }
 
 export default Device

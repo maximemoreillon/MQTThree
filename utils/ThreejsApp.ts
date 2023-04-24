@@ -9,8 +9,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
 import Light from "./devices/Light"
 import Sensor from "./devices/Sensor"
-
-import DebugPlane from "./DebugPlane"
+import Fan from "./devices/Fan"
 
 class ThreejsApp {
   // TODO: consider a MQTT Handler class
@@ -26,7 +25,7 @@ class ThreejsApp {
 
   raycaster: THREE.Raycaster
 
-  devices: (Light | Sensor)[]
+  devices: (Light | Sensor | Fan)[]
 
   constructor({ canvas, mqttClient }: any) {
     const { innerWidth: width, innerHeight: height } = window
@@ -101,16 +100,16 @@ class ThreejsApp {
   }
 
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
-    const foundDevice: any = this.devices.find(
-      (device: any) => device.topic === topic
-    )
-    if (!foundDevice) return
-    try {
-      const payloadJson = JSON.parse(payloadString)
-      foundDevice.stateUpdate(payloadJson)
-    } catch (error) {
-      console.warn(error)
-    }
+    this.devices
+      .filter((d: any) => d.topic === topic)
+      .forEach((d) => {
+        try {
+          const payloadJson = JSON.parse(payloadString)
+          d.stateUpdate(payloadJson)
+        } catch (error) {
+          console.warn(error)
+        }
+      })
   }
 
   getDevicesFromYaml = async () => {
@@ -122,9 +121,11 @@ class ThreejsApp {
         .map(({ type, ...properties }: any) => {
           if (type === "light") return new Light(this, properties)
           else if (type === "sensor") return new Sensor(this, properties)
+          else if (type === "fan") return new Fan(this, properties)
         })
         .filter((d: any) => d)
 
+      // Ambient light is bright by default, unless there are toggle lights in the scene
       const ambientLightIntensity = this.devices.some(
         (d): d is Light => d instanceof Light
       )
@@ -185,7 +186,7 @@ class ThreejsApp {
     this.raycaster.setFromCamera(pointer, this.camera)
 
     const objects = this.devices
-      .filter((d): d is Light => d instanceof Light)
+      .filter((d): d is Light => d instanceof Light || d instanceof Fan)
       .map((d) => d.hitbox)
 
     const intersects = this.raycaster.intersectObjects(objects, false)
@@ -202,6 +203,7 @@ class ThreejsApp {
   animate = () => {
     requestAnimationFrame(this.animate)
     this.controls.update()
+    this.devices.forEach((device) => device.animate())
     this.renderer.render(this.scene, this.camera)
   }
 }

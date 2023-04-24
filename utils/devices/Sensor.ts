@@ -60,7 +60,7 @@ class Sensor extends Device {
   }
 
   stateUpdate = (payload: any): void => {
-    const value = Math.round(payload[this.key])
+    const value = Math.round(100 * payload[this.key]) / 100
     this.spriteMaterial.map = this.generateTextureMapWithText(
       `${value} ${this.unit}`
     )
