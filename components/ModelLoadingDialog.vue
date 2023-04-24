@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="40rem">
+  <v-dialog v-model="dialog" width="40rem" persistent>
     <v-card class="pa-5">
       <v-row justify="center">
         <v-col cols="auto"> Loading model...</v-col>
