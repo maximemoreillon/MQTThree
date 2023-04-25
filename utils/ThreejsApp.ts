@@ -19,6 +19,7 @@ class ThreejsApp {
   renderer: THREE.WebGLRenderer
   camera: THREE.PerspectiveCamera
   controls: OrbitControls
+  ambientLight: THREE.AmbientLight
 
   gridHelper: THREE.GridHelper
   axesHelper: THREE.AxesHelper
@@ -42,6 +43,10 @@ class ThreejsApp {
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
     this.camera.position.set(5, 5, 5)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+
+    // Ambient light is bright by default, unless there are toggle lights in the scene
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 1)
+    this.scene.add(this.ambientLight)
 
     this.devices = []
 
@@ -99,6 +104,11 @@ class ThreejsApp {
     }
   }
 
+  toggleAmbientLight = () => {
+    if (this.ambientLight.intensity === 0.3) this.ambientLight.intensity = 1
+    else this.ambientLight.intensity = 0.3
+  }
+
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
     this.devices
       .filter((d: any) => d.topic === topic)
@@ -125,18 +135,8 @@ class ThreejsApp {
         })
         .filter((d: any) => d)
 
-      // Ambient light is bright by default, unless there are toggle lights in the scene
-      const ambientLightIntensity = this.devices.some(
-        (d): d is Light => d instanceof Light
-      )
-        ? 0.3
-        : 1
-
-      const ambientLight = new THREE.AmbientLight(
-        0xffffff,
-        ambientLightIntensity
-      )
-      this.scene.add(ambientLight)
+      const sceneHasLight = this.devices.some((d) => d instanceof Light)
+      if (sceneHasLight) this.ambientLight.intensity = 0.3
     } catch (error) {
       console.error(error)
     }

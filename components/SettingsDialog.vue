@@ -13,7 +13,7 @@
     <v-card>
       <v-card-title> Settings </v-card-title>
       <v-card-text>
-        <v-row>
+        <v-row justify="space-between">
           <v-col cols="auto">
             <v-btn
               @click="threejsApp.toggleGrid()"
@@ -30,6 +30,15 @@
               variant="text"
             >
               Toggle 3D
+            </v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              @click="threejsApp.toggleAmbientLight()"
+              prepend-icon="mdi-lightbulb"
+              variant="text"
+            >
+              Ambient light
             </v-btn>
           </v-col>
         </v-row>
