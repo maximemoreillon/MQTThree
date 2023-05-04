@@ -11,6 +11,12 @@ import Light from "./devices/Light"
 import Sensor from "./devices/Sensor"
 import Fan from "./devices/Fan"
 import ToggleableDevice from "./devices/ToggleableDevice"
+
+interface EventHandler {
+  event: string
+  handler: Function
+}
+
 class ThreejsApp {
   // TODO: consider a MQTT Handler class
   mqttClient: MQTT.Client
@@ -27,6 +33,8 @@ class ThreejsApp {
   raycaster: THREE.Raycaster
 
   devices: (Light | Sensor | Fan)[]
+
+  handlers: EventHandler[] = []
 
   constructor({ canvas, mqttClient }: any) {
     const { innerWidth: width, innerHeight: height } = window
@@ -144,28 +152,19 @@ class ThreejsApp {
 
   loadModel = () => {
     new GLTFLoader().load(
-      "/api/model",
+      "/express/model",
       (gltf: any) => {
         this.scene.add(gltf.scene)
-        this.onModelLoaded()
+        this.trigger("modelLoaded", null)
       },
-      this.onModelLoading,
+      (xhr: any) => {
+        this.trigger("modelLoading", xhr)
+      },
       (error: any) => {
         console.error(error)
-        // TODO: have a
-        this.onModelLoaded()
+        this.trigger("modelLoaded", null)
       }
     )
-  }
-
-  onModelLoading = (xhr: any) => {
-    // Nothing as overridden
-    // TODO: does not feel like the right option
-  }
-
-  onModelLoaded = () => {
-    // Nothing as overridden
-    // TODO: does not feel like the right option
   }
 
   onWindowResized = () => {
@@ -198,6 +197,23 @@ class ThreejsApp {
     )
 
     if (foundDevice) foundDevice.onClicked()
+  }
+
+  //  Event management
+  on = (event: string, handler: Function) => {
+    this.handlers.push({ event, handler })
+  }
+
+  off = (event: string, handlerToRemove: Function) => {
+    this.handlers = this.handlers.filter(
+      ({ handler }) => handler !== handlerToRemove
+    )
+  }
+
+  trigger = (eventName: string, data: any) => {
+    this.handlers
+      .filter(({ event }) => event == eventName)
+      .forEach(({ handler }) => handler(data))
   }
 
   animate = () => {

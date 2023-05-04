@@ -3,6 +3,9 @@ import vuetify from "vite-plugin-vuetify"
 export default defineNuxtConfig({
   modules: ["@vite-pwa/nuxt"],
   pwa: {},
+  serverHandlers: [
+    { route: "/express/**", handler: "~/customServer/index.ts" },
+  ],
   runtimeConfig: {
     public: {
       mqttHost: "",

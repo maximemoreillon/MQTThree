@@ -6,7 +6,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-progress-linear :indeterminate="true"></v-progress-linear>
+          <v-progress-linear :model-value="progress" />
         </v-col>
       </v-row>
     </v-card>
@@ -15,16 +15,29 @@
 
 <script setup lang="ts">
 const dialog = ref(false)
-
+const progress = ref(0)
 const threejsApp = useThreejsApp()
 
 watch(threejsApp, () => {
   if (!threejsApp.value) return
 
+  threejsApp.value.on("modelLoading", ({ total, loaded }: any) => {
+    progress.value = (100 * loaded) / total
+  })
+
+  threejsApp.value.on("modelLoaded", () => {
+    dialog.value = false
+  })
+
   dialog.value = true
 
-  threejsApp.value.onModelLoaded = () => {
-    dialog.value = false
-  }
+  // Not working
+  // threejsApp.value.onModelLoading = (xhr: any) => {
+  //   console.log(xhr)
+  // }
+
+  // threejsApp.value.onModelLoaded = () => {
+  //   dialog.value = false
+  // }
 })
 </script>
