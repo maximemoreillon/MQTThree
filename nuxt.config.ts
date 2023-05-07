@@ -8,6 +8,7 @@ export default defineNuxtConfig({
       short_name: "MQTThree",
       description: "MQTT + Three.js",
       theme_color: "#444444",
+      start_url: "",
       icons: [
         {
           src: "pwa-192x192.png",
