@@ -2,6 +2,11 @@ import vuetify from "vite-plugin-vuetify"
 
 export default defineNuxtConfig({
   modules: ["@vite-pwa/nuxt"],
+  app: {
+    head: {
+      title: "MQTThree",
+    },
+  },
   pwa: {
     manifest: {
       name: "MQTThree",
