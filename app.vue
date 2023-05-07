@@ -1,6 +1,6 @@
 <template>
+  <VitePwaManifest />
   <v-app>
-    <VitePwaManifest />
     <v-main>
       <ClientOnly>
         <Renderer />
