@@ -7,7 +7,7 @@ import ThreejsApp from "./ThreejsApp"
 
 // TODO: have a proper event handler
 
-class Device {
+export default class Device {
   app: ThreejsApp
 
   // TODO: consider if here or in children
@@ -19,9 +19,8 @@ class Device {
     const { topic } = opts
     this.topic = topic
   }
+
   stateUpdate = (newState: any) => {}
   onClicked = () => {}
   animate = () => {}
 }
-
-export default Device

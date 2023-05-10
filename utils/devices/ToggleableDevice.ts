@@ -21,7 +21,7 @@ interface Params {
   }
 }
 
-class ToggleableDevice extends Device {
+export default class ToggleableDevice extends Device {
   group: THREE.Group
   state: string
   hitbox: THREE.Mesh
@@ -70,5 +70,3 @@ class ToggleableDevice extends Device {
     this.state = state.toLowerCase()
   }
 }
-
-export default ToggleableDevice

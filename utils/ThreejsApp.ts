@@ -17,7 +17,7 @@ interface EventHandler {
   handler: Function
 }
 
-class ThreejsApp {
+export default class ThreejsApp {
   // TODO: consider a MQTT Handler class
   mqttClient: MQTT.Client
 
@@ -231,5 +231,3 @@ class ThreejsApp {
     this.renderer.render(this.scene, this.camera)
   }
 }
-
-export default ThreejsApp
