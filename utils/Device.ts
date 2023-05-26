@@ -5,24 +5,22 @@ import ThreejsApp from "./ThreejsApp"
 // Nuxt instance not available
 // const mqtt = useMqtt()
 
-class Device {
+// TODO: have a proper event handler
+
+export default class Device {
   app: ThreejsApp
 
-  topic: string // TODO: consider if here or in children
+  // TODO: consider if here or in children
+  topic: string
 
   // TODO: mqttClient as second parameter
   constructor(app: ThreejsApp, opts: any) {
     this.app = app
-
     const { topic } = opts
-
     this.topic = topic
-
-    app.mqttClient.subscribe(this.topic)
   }
+
   stateUpdate = (newState: any) => {}
   onClicked = () => {}
   animate = () => {}
 }
-
-export default Device

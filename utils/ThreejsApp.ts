@@ -17,7 +17,7 @@ interface EventHandler {
   handler: Function
 }
 
-class ThreejsApp {
+export default class ThreejsApp {
   // TODO: consider a MQTT Handler class
   mqttClient: MQTT.Client
 
@@ -117,6 +117,12 @@ class ThreejsApp {
     else this.ambientLight.intensity = 0.3
   }
 
+  mqttSubscribeToAll = () => {
+    this.devices.forEach(({ topic }) => {
+      this.mqttClient.subscribe(topic)
+    })
+  }
+
   onMqttMessageArrived = ({ topic, payloadString }: any) => {
     this.devices
       .filter((d: any) => d.topic === topic)
@@ -143,6 +149,8 @@ class ThreejsApp {
         })
         .filter((d: any) => d)
 
+      this.mqttSubscribeToAll()
+
       const sceneHasLight = this.devices.some((d) => d instanceof Light)
       if (sceneHasLight) this.ambientLight.intensity = 0.3
     } catch (error) {
@@ -162,7 +170,7 @@ class ThreejsApp {
       },
       (error: any) => {
         console.error(error)
-        this.trigger("modelLoaded", null)
+        this.trigger("modelLoadError", null)
       }
     )
   }
@@ -223,5 +231,3 @@ class ThreejsApp {
     this.renderer.render(this.scene, this.camera)
   }
 }
-
-export default ThreejsApp

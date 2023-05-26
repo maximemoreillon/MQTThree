@@ -18,7 +18,7 @@ const mqttReconnecting = useMqttReconnecting()
 const threejsApp = useThreejsApp()
 
 const runtimeConfig = useRuntimeConfig()
-const { mqttHost, mqttPort, ambientLightIntensity } = runtimeConfig.public
+const { mqttHost, mqttPort } = runtimeConfig.public
 
 console.log(`Creating an MQTT client with host ${mqttHost}`)
 mqttClient.value = new MQTT.Client(mqttHost, Number(mqttPort), "/", uuidv4())
@@ -34,9 +34,10 @@ onMounted(() => {
 mqttClient.value.onConnected = (reconnect: boolean) => {
   console.log("MQTT onConnected event")
 
-  if (reconnect) mqttReconnecting.value = false
-
-  if (!reconnect && !threejsApp.value)
+  if (reconnect) {
+    mqttReconnecting.value = false
+    threejsApp.value.mqttSubscribeToAll()
+  } else if (!threejsApp.value)
     threejsApp.value = new ThreejsApp({
       canvas: canvas.value,
       mqttClient: mqttClient.value,

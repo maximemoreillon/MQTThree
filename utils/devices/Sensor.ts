@@ -2,7 +2,7 @@ import * as THREE from "three"
 import Device from "../Device"
 import ThreejsApp from "../ThreejsApp"
 
-class Sensor extends Device {
+export default class Sensor extends Device {
   key: string
   unit: string
   spriteMaterial: THREE.SpriteMaterial
@@ -66,5 +66,3 @@ class Sensor extends Device {
     )
   }
 }
-
-export default Sensor

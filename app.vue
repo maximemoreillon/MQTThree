@@ -1,4 +1,5 @@
 <template>
+  <VitePwaManifest />
   <v-app>
     <v-main>
       <ClientOnly>
@@ -7,8 +8,6 @@
     </v-main>
   </v-app>
 </template>
-
-<script lang="ts" setup></script>
 
 <style>
 html,

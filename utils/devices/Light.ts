@@ -15,7 +15,7 @@ interface Params {
   }
 }
 
-class Light extends ToggleableDevice {
+export default class Light extends ToggleableDevice {
   light: THREE.PointLight
 
   constructor(app: ThreejsApp, params: Params) {
@@ -79,5 +79,3 @@ class Light extends ToggleableDevice {
     }
   }
 }
-
-export default Light

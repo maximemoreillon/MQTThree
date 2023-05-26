@@ -40,6 +40,7 @@
             >
               Ambient light
             </v-btn>
+            {{ threejsApp.ambientLight }}
           </v-col>
         </v-row>
         <model-upload />

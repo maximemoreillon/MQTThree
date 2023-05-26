@@ -14,7 +14,7 @@ interface Params {
   }
 }
 
-class Fan extends ToggleableDevice {
+export default class Fan extends ToggleableDevice {
   constructor(app: ThreejsApp, params: Params) {
     super(app, params)
     this.loadModel()
@@ -57,5 +57,3 @@ class Fan extends ToggleableDevice {
     }
   }
 }
-
-export default Fan

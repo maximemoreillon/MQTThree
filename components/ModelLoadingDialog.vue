@@ -20,6 +20,7 @@ const threejsApp = useThreejsApp()
 
 watch(threejsApp, () => {
   if (!threejsApp.value) return
+  dialog.value = true
 
   threejsApp.value.on("modelLoading", ({ total, loaded }: any) => {
     progress.value = (100 * loaded) / total
@@ -29,7 +30,9 @@ watch(threejsApp, () => {
     dialog.value = false
   })
 
-  dialog.value = true
+  threejsApp.value.on("modelLoadError", () => {
+    alert("Model loading failed")
+  })
 
   // Not working
   // threejsApp.value.onModelLoading = (xhr: any) => {
