@@ -22,7 +22,12 @@
   let devices: any[] = [];
   onMount(async () => {
     const { data } = await axios.get("/devices");
-    devices = data;
+    devices = data
+      .map((d: any) => ({
+        ...d,
+        position: new Vector3(d.position.x, d.position.y, d.position.z),
+      }))
+      .filter((d) => d.type === "light");
   });
 </script>
 
@@ -34,7 +39,6 @@
     ref.lookAt(0, 0, 0);
   }}
 >
-  <!-- TODO: Fix camera jumping to random place when disabled -->
   <OrbitControls enabled={$orbitControlsEnabled} />
 </T.PerspectiveCamera>
 
@@ -51,15 +55,15 @@
 />
 
 <!-- Pointer Events do not work -->
-<T.Plane
+<!-- <T.Plane
   args={[new Vector3(0, 1, 0), 0]}
   on:pointermove={() => console.log("hi")}
-/>
+/> -->
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
 {#each devices as device}
-  <Light commandTopic={device.commandTopic} />
+  <Light commandTopic={device.commandTopic} position={device.position} />
 {/each}
 
 <!-- TODO: loader -->
@@ -76,9 +80,9 @@
   }}
 /> -->
 
-{#each cubes as cube}
+<!-- {#each cubes as cube}
   <SelectableCube position={cube}>
     <T.BoxGeometry />
     <T.MeshNormalMaterial />
   </SelectableCube>
-{/each}
+{/each} -->

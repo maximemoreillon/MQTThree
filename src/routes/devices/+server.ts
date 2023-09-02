@@ -19,13 +19,13 @@ export async function POST({ request }){
   const formData = Object.fromEntries(await request.formData());
 
     if ( !formData.devices) {
-      throw 'No model'
+      throw 'No devices'
     }
 
     fs.mkdirSync(dir, { recursive: true });
 
-    const { model } = formData as { model: File };
+    const { devices } = formData as { devices: File };
 
-    fs.writeFileSync(filePath, Buffer.from(await model.arrayBuffer()));
+    fs.writeFileSync(filePath, Buffer.from(await devices.arrayBuffer()));
   return new Response("hi")
 }

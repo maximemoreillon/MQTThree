@@ -1,22 +1,13 @@
 <script lang="ts">
-  import axios from "axios";
-
-  let fileList: FileList;
-
-  async function handleSumbit() {
-    const body = new FormData();
-    body.append("model", fileList[0]);
-
-    const { data } = await axios.post("/model", body);
-    console.log(data);
-  }
+  import ModelUploadForm from "$lib/components/ModelUploadForm.svelte";
+  import ConfigUploadForm from "$lib/components/ConfigUploadForm.svelte";
 </script>
 
 <div>
-  <form on:submit|preventDefault={() => handleSumbit()}>
-    <input type="file" accept=".glb" bind:files={fileList} />
-    <button type="submit">Upload</button>
-  </form>
+  <h2>Model</h2>
+  <ModelUploadForm />
+  <h2>Config</h2>
+  <ConfigUploadForm />
 
   <a href="/">Home</a>
 </div>
