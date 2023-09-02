@@ -9,12 +9,21 @@
     GLTF,
   } from "@threlte/extras";
   import SelectableCube from "./SelectableCube.svelte";
+  import Light from "./Light.svelte";
   import { orbitControlsEnabled, createMode } from "$lib/states";
   import { Vector3 } from "three";
+  import axios from "axios";
+  import { onMount } from "svelte";
 
   interactivity();
 
   let cubes: any[] = [];
+
+  let devices: any[] = [];
+  onMount(async () => {
+    const { data } = await axios.get("/devices");
+    devices = data;
+  });
 </script>
 
 <T.PerspectiveCamera
@@ -49,8 +58,12 @@
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
+{#each devices as device}
+  <Light commandTopic={device.commandTopic} />
+{/each}
+
 <!-- TODO: loader -->
-<GLTF
+<!-- <GLTF
   url="/model"
   interactive
   on:load={(e) => {
@@ -61,7 +74,7 @@
     cubes = [...cubes, e.point];
     createMode.set(false);
   }}
-/>
+/> -->
 
 {#each cubes as cube}
   <SelectableCube position={cube}>

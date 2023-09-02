@@ -1,8 +1,13 @@
 import fs from 'fs'
 import path from 'path'
 
+const modelDirectory = './config'
+const modelFileName = 'model.glb'
+
 export async function GET(){
-  const data = await fs.promises.readFile(`./models/model.glb`)
+
+  const modelPath = path.join(modelDirectory, modelFileName)
+  const data = await fs.promises.readFile(modelPath)
   return new Response(data)
 }
 
@@ -13,13 +18,13 @@ export async function POST({ request }){
       throw 'No model'
     }
 
-    const dir = './models'
+    const dir = './config'
 
     fs.mkdirSync(dir, { recursive: true });
 
     const { model } = formData as { model: File };
 
-    // PROBLEM: static cannot be used for thi
-    fs.writeFileSync(path.join(dir,`model.glb`), Buffer.from(await model.arrayBuffer()));
+    const modelPath = path.join(dir,modelFileName)
+    fs.writeFileSync(modelPath, Buffer.from(await model.arrayBuffer()));
   return new Response("hi")
 }

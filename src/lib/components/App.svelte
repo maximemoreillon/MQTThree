@@ -16,15 +16,19 @@
     CreateMode {$createMode ? "Enabled" : "Disabled"}
   </button>
   <a href="/config">Config</a>
+
+  <a href="/login">Login</a>
 </div>
 
 <style>
   .controls_wrapper {
+    padding: 1rem;
     position: fixed;
     top: 10px;
     left: 10px;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
+    background-color: white;
   }
 </style>
