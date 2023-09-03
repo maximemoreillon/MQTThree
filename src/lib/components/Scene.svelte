@@ -27,7 +27,7 @@
         ...d,
         position: new Vector3(d.position.x, d.position.y, d.position.z),
       }))
-      .filter((d) => d.type === "light");
+      .filter((d: any) => d.type === "light");
   });
 </script>
 
@@ -63,22 +63,21 @@
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
 {#each devices as device}
-  <Light commandTopic={device.commandTopic} position={device.position} />
+  <Light
+    commandTopic={device.commandTopic}
+    position={device.position}
+    topic={device.topic}
+  />
 {/each}
 
 <!-- TODO: loader -->
-<!-- <GLTF
+<GLTF
   url="/model"
   interactive
   on:load={(e) => {
     console.log(e);
   }}
-  on:click={(e) => {
-    if (!$createMode) return;
-    cubes = [...cubes, e.point];
-    createMode.set(false);
-  }}
-/> -->
+/>
 
 <!-- {#each cubes as cube}
   <SelectableCube position={cube}>
