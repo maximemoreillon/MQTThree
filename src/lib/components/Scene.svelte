@@ -8,7 +8,6 @@
     Text,
     GLTF,
   } from "@threlte/extras";
-  import SelectableCube from "./SelectableCube.svelte";
   import Light from "./Light.svelte";
   import { orbitControlsEnabled, createMode } from "$lib/states";
   import { Vector3 } from "three";
@@ -17,11 +16,10 @@
 
   interactivity();
 
-  let cubes: any[] = [];
-
   let devices: any[] = [];
   onMount(async () => {
     const { data } = await axios.get("/devices");
+    console.log(data);
     devices = data
       .map((d: any) => ({
         ...d,
@@ -48,8 +46,8 @@
 <Grid
   position.y={0}
   cellColor="#ffffff"
-  sectionColor="#ffffff"
-  sectionThickness={0}
+  sectionColor="#c00000"
+  sectionThickness={2}
   fadeDistance={25}
   cellSize={2}
 />
@@ -71,13 +69,13 @@
 {/each}
 
 <!-- TODO: loader -->
-<GLTF
+<!-- <GLTF
   url="/model"
   interactive
   on:load={(e) => {
     console.log(e);
   }}
-/>
+/> -->
 
 <!-- {#each cubes as cube}
   <SelectableCube position={cube}>
