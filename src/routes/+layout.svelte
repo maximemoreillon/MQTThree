@@ -2,7 +2,8 @@
   import { init as mqttInit, client } from "$lib/mqtt";
   import { onMount } from "svelte";
 
-  $: connected = $client?.isConnected() ? "Connected" : "Disconnected";
+  // PROBLEM: is not reactive
+  $: connected = client?.isConnected() ? "Connected" : "Disconnected";
 
   onMount(() => {
     mqttInit();

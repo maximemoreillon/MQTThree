@@ -20,22 +20,29 @@
   $: color = isOn ? "#00c000" : "#c00000";
 
   function handleClick() {
-    if (!$client.isConnected()) return;
+    if (!client.isConnected()) return;
     const payload = JSON.stringify({ state: "toggle" });
     const message = new MQTT.Message(payload);
     message.destinationName = commandTopic;
-    $client.send(message);
+    client.send(message);
   }
 
   // TODO: subscribe if both mounted and mqtt connected
   onMount(() => {
+
+    on("connected", () => {
+      client.subscribe(topic);
+    })
+
     on("message", (message: MQTT.Message) => {
       if (message.destinationName !== topic) return;
       const payload = JSON.parse(message.payloadString);
       state = payload.state;
     });
 
-    if ($client.isConnected()) $client.subscribe(topic);
+
+
+    if (client.isConnected()) client.subscribe(topic);
   });
 </script>
 
@@ -44,7 +51,7 @@
   <!-- Hitbox -->
   <T.Mesh on:click={handleClick}>
     <T.BoxGeometry args={[0.5, 0.5, 0.5]} />
-    <T.MeshStandardMaterial visible={false} />
+    <T.MeshStandardMaterial visible={true} {color}/>
   </T.Mesh>
 
   <LightModel {scale} position.z={24 * scale} />
