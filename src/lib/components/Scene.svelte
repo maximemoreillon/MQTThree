@@ -40,8 +40,8 @@
   <OrbitControls enabled={$orbitControlsEnabled} />
 </T.PerspectiveCamera>
 
-<T.DirectionalLight intensity={0.8} position.x={5} position.y={10} />
-<T.AmbientLight intensity={0.2} />
+<!-- <T.DirectionalLight intensity={0.8} position.x={5} position.y={10} />
+<T.AmbientLight intensity={0.2} /> -->
 
 <Grid
   position.y={0}
@@ -69,17 +69,10 @@
 {/each}
 
 <!-- TODO: loader -->
-<!-- <GLTF
+<GLTF
   url="/model"
   interactive
   on:load={(e) => {
     console.log(e);
   }}
-/> -->
-
-<!-- {#each cubes as cube}
-  <SelectableCube position={cube}>
-    <T.BoxGeometry />
-    <T.MeshNormalMaterial />
-  </SelectableCube>
-{/each} -->
+/>

@@ -16,7 +16,9 @@
   const scale = 0.015;
 
   let state: string = "off";
-  $: color = state.toLowerCase() === "on" ? "#00c000" : "#c00000";
+  $: isOn = state.toLowerCase() === "on";
+  $: color = isOn ? "#00c000" : "#c00000";
+
   function handleClick() {
     if (!$client.isConnected()) return;
     const payload = JSON.stringify({ state: "toggle" });
@@ -46,4 +48,8 @@
   </T.Mesh>
 
   <LightModel {scale} position.z={24 * scale} />
+
+  {#if isOn}
+    <T.PointLight intensity={0.2} />
+  {/if}
 </T.Group>
