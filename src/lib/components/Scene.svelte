@@ -8,8 +8,8 @@
     Text,
     GLTF,
   } from "@threlte/extras";
-  import Light from "./Light.svelte";
-  import { orbitControlsEnabled, createMode } from "$lib/states";
+  import Light from "./devices/Light.svelte";
+  import { orbitControlsEnabled } from "$lib/states";
   import { Vector3 } from "three";
   import axios from "axios";
   import { onMount } from "svelte";
@@ -19,13 +19,10 @@
   let devices: any[] = [];
   onMount(async () => {
     const { data } = await axios.get("/devices");
-    console.log(data);
-    devices = data
-      .map((d: any) => ({
-        ...d,
-        position: new Vector3(d.position.x, d.position.y, d.position.z),
-      }))
-      .filter((d: any) => d.type === "light");
+    devices = data.map((d: any) => ({
+      ...d,
+      position: new Vector3(d.position.x, d.position.y, d.position.z),
+    }));
   });
 </script>
 
@@ -52,7 +49,7 @@
   cellSize={2}
 />
 
-<!-- Pointer Events do not work -->
+<!-- Pointer Events do not work on planes-->
 <!-- <T.Plane
   args={[new Vector3(0, 1, 0), 0]}
   on:pointermove={() => console.log("hi")}
@@ -61,18 +58,15 @@
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
 {#each devices as device}
-  <Light
-    commandTopic={device.commandTopic}
-    position={device.position}
-    topic={device.topic}
-  />
+  {#if device.type === "light"}
+    <Light
+      commandTopic={device.commandTopic}
+      position={device.position}
+      topic={device.topic}
+    />
+  {/if}
 {/each}
 
 <!-- TODO: loader -->
-<GLTF
-  url="/model"
-  interactive
-  on:load={(e) => {
-    console.log(e);
-  }}
-/>
+<!-- PROBLEM: might need preparation with  npx @threlte/gltf@1.0.1 light.glb --transform -->
+<GLTF url="/model" interactive />

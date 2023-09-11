@@ -1,5 +1,3 @@
-// TODO: consider having an event dispatcher
-
 import { writable } from 'svelte/store';
 import MQTT from 'paho-mqtt';
 
@@ -12,27 +10,20 @@ const {
 } = import.meta.env;
 
 
-// TODO: figure out if client really needs to be a writable
-
 export let client:  MQTT.Client 
 export const connected = writable(false)
 
 export function init(){
 
+  // TODO: client UUID
   client = new MQTT.Client(
     VITE_PUBLIC_MQTT_HOST,
     Number(VITE_PUBLIC_MQTT_PORT),
     "/"
   )
 
-  client.onMessageArrived = (message: MQTT.Message) => {
-    // TODO: filter only for "message" handlers
-    eventHandlers
-    .filter(({event}: any) => event === 'message')
-    .forEach(({callback}:any) => callback(message))
-  }
-
-  console.log('Client init OK')
+  client.onMessageArrived = handleMessage
+  client.onConnectionLost = handleConnectionLost
 
   const userName = localStorage.getItem("userName")
   const password = localStorage.getItem("password")
@@ -43,13 +34,24 @@ export function on (event: string, callback: Function) {
   eventHandlers.push({event, callback})
 }
 
+function handleMessage  (message: MQTT.Message) {
+  eventHandlers
+  .filter(({event}: any) => event === 'message')
+  .forEach(({callback}:any) => callback(message))
+}
+
+function handleConnectionLost(){
+  connected.set(false)
+}
 
 function onFailure(error: MQTT.ErrorWithInvocationContext) {
   console.error(error);
+  connected.set(false)
 }
 
 function onSuccess() {
-  console.log("MQTT connected");
+  // TODO: check if reconnection
+  connected.set(true)
   eventHandlers
     .filter(({event}: any) => event === 'connected')
     .forEach(({callback}:any) => callback())

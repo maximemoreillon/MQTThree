@@ -2,6 +2,8 @@
   import { Canvas } from "@threlte/core";
   import Scene from "./Scene.svelte";
   import { orbitControlsEnabled, createMode } from "$lib/states";
+  import { connected as mqttConnected } from "$lib/mqtt";
+
 </script>
 
 <Canvas>
@@ -9,12 +11,13 @@
 </Canvas>
 
 <div class="controls_wrapper">
-  <button on:click={() => orbitControlsEnabled.set(!$orbitControlsEnabled)}>
+  <span>{$mqttConnected ?  'Connected' : 'Disconnected'  }</span>
+  <!-- <button on:click={() => orbitControlsEnabled.set(!$orbitControlsEnabled)}>
     OrbitControls {$orbitControlsEnabled ? "Enabled" : "Disabled"}
   </button>
   <button on:click={() => createMode.set(!$createMode)}>
     CreateMode {$createMode ? "Enabled" : "Disabled"}
-  </button>
+  </button> -->
   <a href="/config">Config</a>
 
   <a href="/login">Login</a>

@@ -5,7 +5,7 @@
   import { client, on } from "$lib/mqtt";
   import MQTT from "paho-mqtt";
   import { onMount } from "svelte";
-  import LightModel from "$lib/components/LightModel.svelte";
+  import LightModel from "./LightModel.svelte";
 
   interactivity();
 
@@ -17,9 +17,11 @@
 
   let state: string = "off";
   $: isOn = state.toLowerCase() === "on";
-  $: color = isOn ? "#00c000" : "#c00000";
+  $: color = isOn ? "#ffff00" : "#ffffff";
+  $: opacity = isOn ? 0.5 : 0.25
 
   function handleClick() {
+    state = state == "on" ? "off" : "on"
     if (!client.isConnected()) return;
     const payload = JSON.stringify({ state: "toggle" });
     const message = new MQTT.Message(payload);
@@ -46,12 +48,11 @@
   });
 </script>
 
-<!-- TODO: Bulb model -->
 <T.Group position={position.toArray()}>
   <!-- Hitbox -->
   <T.Mesh on:click={handleClick}>
-    <T.BoxGeometry args={[0.5, 0.5, 0.5]} />
-    <T.MeshStandardMaterial visible={true} {color}/>
+    <T.SphereGeometry args={[0.25]} />
+    <T.MeshStandardMaterial transparent {opacity} {color}/>
   </T.Mesh>
 
   <LightModel {scale} position.z={24 * scale} />
