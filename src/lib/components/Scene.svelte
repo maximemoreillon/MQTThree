@@ -69,4 +69,4 @@
 
 <!-- TODO: loader -->
 <!-- PROBLEM: might need preparation with  npx @threlte/gltf@1.0.1 light.glb --transform -->
-<GLTF url="/model" interactive />
+<GLTF url="/model" interactive castShadow receiveShadow />
