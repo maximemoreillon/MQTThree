@@ -14,7 +14,9 @@
   },
   "devDependencies": {
     "@smui/button": "^7.0.0-beta.16",
+    "@smui/dialog": "^7.0.0-beta.16",
     "@smui/fab": "^7.0.0-beta.16",
+    "@smui/textfield": "^7.0.0-beta.16",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/adapter-node": "^1.3.1",
     "@sveltejs/kit": "^1.20.4",
@@ -23,6 +25,7 @@
     "@types/node": "^20.5.7",
     "@types/paho-mqtt": "^1.0.7",
     "@types/three": "^0.152.1",
+    "@types/uuid": "^9.0.7",
     "smui-theme": "^7.0.0-beta.16",
     "svelte": "^4.0.5",
     "svelte-check": "^3.4.3",
@@ -33,8 +36,10 @@
   },
   "type": "module",
   "dependencies": {
+    "@smui/circular-progress": "^7.0.0-beta.16",
     "axios": "^1.5.0",
     "paho-mqtt": "^1.1.0",
+    "uuid": "^9.0.1",
     "yaml": "^2.3.2"
   }
 }

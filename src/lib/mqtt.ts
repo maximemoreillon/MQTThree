@@ -1,11 +1,12 @@
 import { writable } from 'svelte/store';
 import MQTT from 'paho-mqtt';
+import { v4 as uuidv4 } from 'uuid';
 
 const eventHandlers: {event: string, callback: Function}[] = []
 
 const {
-  VITE_PUBLIC_MQTT_HOST,
-  VITE_PUBLIC_MQTT_PORT,
+  VITE_PUBLIC_MQTT_HOST = "localhost",
+  VITE_PUBLIC_MQTT_PORT = "1883",
   VITE_PUBLIC_MQTT_USE_SSL
 } = import.meta.env;
 
@@ -15,11 +16,11 @@ export const connected = writable(false)
 
 export function init(){
 
-  // TODO: client UUID
   client = new MQTT.Client(
     VITE_PUBLIC_MQTT_HOST,
     Number(VITE_PUBLIC_MQTT_PORT),
-    "/"
+    "/",
+    uuidv4()
   )
 
   client.onMessageArrived = handleMessage
