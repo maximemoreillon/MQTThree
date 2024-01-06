@@ -8,7 +8,7 @@
     const body = new FormData();
     body.append("model", fileList[0]);
 
-    await axios.post("/model", body);
+    await axios.post("/api/model", body);
     alert("Upload OK");
   }
 </script>

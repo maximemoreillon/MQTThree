@@ -1,14 +1,14 @@
 import { writable } from 'svelte/store';
 import MQTT from 'paho-mqtt';
 import { v4 as uuidv4 } from 'uuid';
-
+import {env} from '$env/dynamic/public'
 const eventHandlers: {event: string, callback: Function}[] = []
 
 const {
-  VITE_PUBLIC_MQTT_HOST = "localhost",
-  VITE_PUBLIC_MQTT_PORT = "1883",
-  VITE_PUBLIC_MQTT_USE_SSL
-} = import.meta.env;
+  PUBLIC_MQTT_HOST = "localhost",
+  PUBLIC_MQTT_PORT = "9001",
+  PUBLIC_MQTT_USE_SSL
+} = env;
 
 
 export let client:  MQTT.Client 
@@ -17,8 +17,8 @@ export const connected = writable(false)
 export function init(){
 
   client = new MQTT.Client(
-    VITE_PUBLIC_MQTT_HOST,
-    Number(VITE_PUBLIC_MQTT_PORT),
+    PUBLIC_MQTT_HOST,
+    Number(PUBLIC_MQTT_PORT),
     "/",
     uuidv4()
   )
@@ -64,7 +64,7 @@ export function login(userName: string, password: string) {
     onFailure,
     userName,
     password,
-    useSSL: !!VITE_PUBLIC_MQTT_USE_SSL,
+    useSSL: !!PUBLIC_MQTT_USE_SSL,
     keepAliveInterval: 30,
     reconnect: true,
   };

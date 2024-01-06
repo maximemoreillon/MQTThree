@@ -7,7 +7,7 @@
     const body = new FormData();
     body.append("devices", fileList[0]);
 
-    const { data } = await axios.post("/devices", body);
+    const { data } = await axios.post("/api/devices", body);
     alert("Upload OK");
   }
 </script>

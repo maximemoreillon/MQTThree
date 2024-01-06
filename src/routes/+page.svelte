@@ -6,10 +6,9 @@
   import Fab, { Icon } from "@smui/fab";
   import Dialog, { Content, Actions } from "@smui/dialog";
   import CircularProgress from "@smui/circular-progress";
-  import LoginForm from "$lib/components/LoginForm.svelte";
+  import LoginForm from "$lib/components/MqttLoginForm.svelte";
+  import MqttLoginForm from "$lib/components/MqttLoginForm.svelte";
 </script>
-
-<!-- TODO: could have Scene code directly here -->
 
 {#if $mqttConnected}
   <div class="threejs_wrapper">
@@ -18,7 +17,7 @@
     </Canvas>
   </div>
 {:else}
-  <LoginForm />
+  <MqttLoginForm />
 {/if}
 
 <Fab color="primary" href="/config" class="settings_button">

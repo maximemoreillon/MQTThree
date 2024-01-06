@@ -14,11 +14,13 @@
   import axios from "axios";
   import { onMount } from "svelte";
 
+  const modelPath = "/api/model";
+
   interactivity();
 
   let devices: any[] = [];
   onMount(async () => {
-    const { data } = await axios.get("/devices");
+    const { data } = await axios.get("/api/devices");
     devices = data.map((d: any) => ({
       ...d,
       position: new Vector3(d.position.x, d.position.y, d.position.z),
@@ -69,4 +71,4 @@
 
 <!-- TODO: loader -->
 <!-- PROBLEM: might need preparation with  npx @threlte/gltf@1.0.1 light.glb --transform -->
-<GLTF url="/model" interactive castShadow receiveShadow />
+<GLTF url={modelPath} interactive castShadow receiveShadow />

@@ -3,7 +3,6 @@
   import Button, { Label, Icon as ButtonIcon } from "@smui/button";
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
-  import HelperText from "@smui/textfield/helper-text";
 
   let userName = "";
   let password = "";
@@ -13,7 +12,7 @@
   <Textfield bind:value={userName} label="Username">
     <Icon class="material-icons" slot="leadingIcon">person</Icon>
   </Textfield>
-  <Textfield bind:value={password} label="Password">
+  <Textfield bind:value={password} label="Password" type="password">
     <Icon class="material-icons" slot="leadingIcon">lock</Icon>
   </Textfield>
   <Button type="submit">
