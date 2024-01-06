@@ -3,35 +3,21 @@
   import Scene from "./Scene.svelte";
   import { orbitControlsEnabled, createMode } from "$lib/states";
   import { connected as mqttConnected } from "$lib/mqtt";
-
+  import Fab, { Icon } from "@smui/fab";
 </script>
 
 <Canvas>
   <Scene />
 </Canvas>
 
-<div class="controls_wrapper">
-  <span>{$mqttConnected ?  'Connected' : 'Disconnected'  }</span>
-  <!-- <button on:click={() => orbitControlsEnabled.set(!$orbitControlsEnabled)}>
-    OrbitControls {$orbitControlsEnabled ? "Enabled" : "Disabled"}
-  </button>
-  <button on:click={() => createMode.set(!$createMode)}>
-    CreateMode {$createMode ? "Enabled" : "Disabled"}
-  </button> -->
-  <a href="/config">Config</a>
-
-  <a href="/login">Login</a>
-</div>
+<Fab color="primary" href="/config" class="settings_button">
+  <Icon class="material-icons">settings</Icon>
+</Fab>
 
 <style>
-  .controls_wrapper {
-    padding: 1rem;
+  :global(.settings_button) {
     position: fixed;
-    top: 10px;
-    left: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    background-color: white;
+    top: 2em;
+    left: 2em;
   }
 </style>

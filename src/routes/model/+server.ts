@@ -18,13 +18,11 @@ export async function POST({ request }){
       throw 'No model'
     }
 
-    const dir = './config'
-
-    fs.mkdirSync(dir, { recursive: true });
+    fs.mkdirSync(modelDirectory, { recursive: true });
 
     const { model } = formData as { model: File };
 
-    const modelPath = path.join(dir,modelFileName)
+    const modelPath = path.join(modelDirectory,modelFileName)
     fs.writeFileSync(modelPath, Buffer.from(await model.arrayBuffer()));
   return new Response("hi")
 }

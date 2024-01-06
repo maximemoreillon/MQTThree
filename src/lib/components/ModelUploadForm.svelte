@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Button, { Label } from "@smui/button";
   import axios from "axios";
 
   let fileList: FileList;
@@ -14,5 +15,7 @@
 
 <form on:submit|preventDefault={() => handleSumbit()}>
   <input type="file" accept=".glb" bind:files={fileList} />
-  <button type="submit">Upload</button>
+  <Button type="submit">
+    <Label>Upload</Label>
+  </Button>
 </form>
