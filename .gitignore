@@ -8,5 +8,10 @@ node_modules
 dist
 .DS_Store
 
+.svelte-kit
+build
+
 model
+*.glb
 config.yml
+devices.yml
