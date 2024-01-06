@@ -1,7 +1,7 @@
 import vuetify from "vite-plugin-vuetify"
 
 export default defineNuxtConfig({
-  modules: ["@vite-pwa/nuxt"],
+  modules: ["@vite-pwa/nuxt", "@tresjs/nuxt"],
   app: {
     head: {
       title: "MQTThree",
