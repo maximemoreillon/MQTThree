@@ -8,7 +8,8 @@ const { scene: model } = await useGLTF(
   { draco: true },
   ({ manager }) => {
     manager.onStart = () => emit("loadStart")
-    manager.onProgress = (e) => emit("loadProgress", e)
+    manager.onProgress = (url, loaded, total) =>
+      emit("loadProgress", { url, loaded, total })
     manager.onLoad = () => emit("loadEnd")
     manager.onError = () => emit("loadError")
   }
