@@ -1,5 +1,6 @@
 <script lang="ts">
   import axios from "axios";
+  import Button, { Label, Icon } from "@smui/button";
 
   let fileList: FileList;
 
@@ -14,5 +15,8 @@
 
 <form on:submit|preventDefault={() => handleSumbit()}>
   <input type="file" accept=".yaml,.yml" bind:files={fileList} />
-  <button type="submit">Upload</button>
+  <Button type="submit">
+    <Icon class="material-icons">upload</Icon>
+    <Label>Upload</Label>
+  </Button>
 </form>

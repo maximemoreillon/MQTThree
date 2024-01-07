@@ -6,8 +6,8 @@
   import Fab, { Icon } from "@smui/fab";
   import Dialog, { Content, Actions } from "@smui/dialog";
   import CircularProgress from "@smui/circular-progress";
-  import LoginForm from "$lib/components/MqttLoginForm.svelte";
-  import MqttLoginForm from "$lib/components/MqttLoginForm.svelte";
+  import { goto } from "$app/navigation";
+
   import { login as mqttLogin } from "$lib/mqtt";
   import { onMount } from "svelte";
   import axios from "axios";
@@ -21,6 +21,7 @@
     } catch (error) {
       // TODO: navigate to login page
       console.error(error);
+      goto("/login");
     }
   });
 </script>

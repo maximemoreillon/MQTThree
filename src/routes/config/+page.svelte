@@ -4,9 +4,9 @@
 </script>
 
 <div>
-  <h2>Model</h2>
+  <h3>Model</h3>
   <ModelUploadForm />
-  <h2>Config</h2>
+  <h3>Config</h3>
   <ConfigUploadForm />
 
   <a href="/">Home</a>

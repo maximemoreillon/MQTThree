@@ -6,15 +6,12 @@
 </script>
 
 <form method="post" use:enhance>
-  <!-- SMUI Textfields do not support name="" -->
-  <!-- <Textfield label="Username" name="username">
+  <Textfield label="Username" input$name="username" value="">
     <Icon class="material-icons" slot="leadingIcon">person</Icon>
   </Textfield>
-  <Textfield label="Password" type="password" name="password">
+  <Textfield label="Password" type="password" input$name="password" value="">
     <Icon class="material-icons" slot="leadingIcon">lock</Icon>
-  </Textfield> -->
-  <input type="text" name="username" />
-  <input type="password" name="password" />
+  </Textfield>
   <Button type="submit">
     <ButtonIcon class="material-icons">login</ButtonIcon>
     <Label>Login</Label>
