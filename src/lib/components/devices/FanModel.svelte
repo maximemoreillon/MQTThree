@@ -8,15 +8,15 @@ Title: Propeller Polygon
 -->
 
 <script>
-  import { Group } from 'three'
-  import { T, forwardEventHandlers } from '@threlte/core'
-  import { useGltf } from '@threlte/extras'
+  import { Group } from "three";
+  import { T, forwardEventHandlers } from "@threlte/core";
+  import { useGltf } from "@threlte/extras";
 
-  export const ref = new Group()
+  export const ref = new Group();
 
-  const gltf = useGltf('/fan-transformed.glb', { useDraco: true })
+  const gltf = useGltf("/models/fan-transformed.glb", { useDraco: true });
 
-  const component = forwardEventHandlers()
+  const component = forwardEventHandlers();
 </script>
 
 <T is={ref} dispose={false} {...$$restProps} bind:this={$component}>
@@ -26,7 +26,7 @@ Title: Propeller Polygon
     <T.Mesh
       geometry={gltf.nodes.Object_2.geometry}
       material={gltf.materials.initialShadingGroup}
-      rotation={[-Math.PI / 2, 0, 0]}
+      rotation={[0, 0, -Math.PI / 2]}
     />
   {:catch error}
     <slot name="error" {error} />

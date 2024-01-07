@@ -9,6 +9,7 @@
     GLTF,
   } from "@threlte/extras";
   import Light from "./devices/Light.svelte";
+  import Fan from "./devices/Fan.svelte";
   import { orbitControlsEnabled } from "$lib/states";
   import { Vector3 } from "three";
   import axios from "axios";
@@ -61,14 +62,16 @@
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
-{#each devices as device}
-  {#if device.type === "light"}
-    <Light
-      commandTopic={device.commandTopic}
-      position={device.position}
-      topic={device.topic}
-    />
-  {/if}
+{#each devices.filter(({ type }) => type === "light") as device}
+  <Light
+    commandTopic={device.commandTopic}
+    position={device.position}
+    topic={device.topic}
+  />
+{/each}
+
+{#each devices.filter(({ type }) => type === "fan") as device}
+  <Fan {device} />
 {/each}
 
 <!-- TODO: loader -->
