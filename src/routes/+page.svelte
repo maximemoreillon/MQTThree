@@ -24,7 +24,6 @@
   });
 </script>
 
-<!-- TODO: check if mqtt is connected -->
 {#if $mqttConnected}
   <div class="threejs_wrapper">
     <Canvas>
