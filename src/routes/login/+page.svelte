@@ -3,21 +3,14 @@
   import Button, { Label, Icon as ButtonIcon } from "@smui/button";
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
-
-  let username = "";
-  let password = "";
 </script>
 
 <form method="post" use:enhance>
-  <!-- <Textfield bind:value={username} label="Username" name="username">
+  <!-- SMUI Textfields do not support name="" -->
+  <!-- <Textfield label="Username" name="username">
     <Icon class="material-icons" slot="leadingIcon">person</Icon>
   </Textfield>
-  <Textfield
-    bind:value={password}
-    label="Password"
-    type="password"
-    name="password"
-  >
+  <Textfield label="Password" type="password" name="password">
     <Icon class="material-icons" slot="leadingIcon">lock</Icon>
   </Textfield> -->
   <input type="text" name="username" />

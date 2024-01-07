@@ -8,17 +8,29 @@
   import CircularProgress from "@smui/circular-progress";
   import LoginForm from "$lib/components/MqttLoginForm.svelte";
   import MqttLoginForm from "$lib/components/MqttLoginForm.svelte";
+  import { login as mqttLogin } from "$lib/mqtt";
+  import { onMount } from "svelte";
+  import axios from "axios";
+
+  onMount(async () => {
+    if ($mqttConnected) return;
+    try {
+      const { data } = await axios.get("/api/mqttcredentials");
+      const { username, password } = data;
+      mqttLogin(username, password);
+    } catch (error) {
+      // TODO: navigate to login page
+      console.error(error);
+    }
+  });
 </script>
 
-{#if $mqttConnected}
-  <div class="threejs_wrapper">
-    <Canvas>
-      <Scene />
-    </Canvas>
-  </div>
-{:else}
-  <MqttLoginForm />
-{/if}
+<!-- TODO: check if mqtt is connected -->
+<div class="threejs_wrapper">
+  <Canvas>
+    <Scene />
+  </Canvas>
+</div>
 
 <Fab color="primary" href="/config" class="settings_button">
   <Icon class="material-icons">settings</Icon>

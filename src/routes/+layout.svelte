@@ -1,13 +1,10 @@
 <script lang="ts">
-  import { init as mqttInit, connected as mqttConnected } from "$lib/mqtt";
+  import { init as mqttInit } from "$lib/mqtt";
   import { onMount } from "svelte";
 
-  
-  onMount(() => {
+  onMount(async () => {
     mqttInit();
   });
 </script>
 
 <slot />
-
-

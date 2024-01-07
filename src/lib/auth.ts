@@ -1,9 +1,14 @@
 import type { RequestEvent } from "@sveltejs/kit";
-import axios from 'axios'
+import jwt from 'jsonwebtoken'
+import {env} from "$env/dynamic/private"
 
-export const checkAuthExternally = async ({request}: RequestEvent) => {
-  const authHeader = request.headers.get('authorization')
-  console.log(request.headers)
+const {JWT_SECRET} = env
 
+export const checkAuth = async ({cookies}: RequestEvent) => {
+  const token = cookies.get('token')
+  if(!token) throw 'No token'
+  jwt.verify(token, JWT_SECRET)
 }
+
+
 

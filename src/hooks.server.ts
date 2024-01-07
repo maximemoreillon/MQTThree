@@ -1,13 +1,13 @@
-import {checkAuthExternally} from '$lib/auth'
+import {checkAuth} from '$lib/auth'
+
 export async function handle({ event, resolve }) {
 
-  // Require authentication for routes related to models
 	if (event.url.pathname.startsWith('/api')) {
-    await checkAuthExternally(event)
+		// TODO: error handling
+		await checkAuth(event)
 	  return await resolve(event);;
 	}
 
-  
 
 	return await resolve(event);
 }

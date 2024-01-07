@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import MQTT from 'paho-mqtt';
 import { v4 as uuidv4 } from 'uuid';
 import {env} from '$env/dynamic/public'
+import axios from 'axios'
 const eventHandlers: {event: string, callback: Function}[] = []
 
 const {
@@ -26,9 +27,10 @@ export function init(){
   client.onMessageArrived = handleMessage
   client.onConnectionLost = handleConnectionLost
 
-  const userName = localStorage.getItem("userName")
-  const password = localStorage.getItem("password")
-  if( userName && password && !client.isConnected()) login(userName, password)
+  // TODO: login using credentials from the backend
+
+
+
 }
 
 export function on (event: string, callback: Function) {
@@ -71,7 +73,4 @@ export function login(userName: string, password: string) {
 
   client.connect(connectionOptions);
 
-  // Not secure but will do for testing
-  localStorage.setItem("userName", userName)
-  localStorage.setItem("password", password)
 }
