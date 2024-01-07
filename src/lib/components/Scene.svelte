@@ -13,8 +13,10 @@
   import { Vector3 } from "three";
   import axios from "axios";
   import { onMount } from "svelte";
+  import { createEventDispatcher } from "svelte";
 
   const modelPath = "/api/model";
+  const dispatch = createEventDispatcher();
 
   interactivity();
 
@@ -71,4 +73,10 @@
 
 <!-- TODO: loader -->
 <!-- PROBLEM: might need preparation with  npx @threlte/gltf@1.0.1 light.glb --transform -->
-<GLTF url={modelPath} interactive castShadow receiveShadow />
+<GLTF
+  url={modelPath}
+  interactive
+  castShadow
+  receiveShadow
+  on:load={() => dispatch("modelLoaded")}
+/>

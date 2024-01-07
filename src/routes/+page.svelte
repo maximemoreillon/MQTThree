@@ -12,6 +12,8 @@
   import { onMount } from "svelte";
   import axios from "axios";
 
+  let modelLoaded = false;
+
   onMount(async () => {
     if ($mqttConnected) return;
     try {
@@ -27,13 +29,23 @@
 {#if $mqttConnected}
   <div class="threejs_wrapper">
     <Canvas>
-      <Scene />
+      <Scene on:modelLoaded={() => (modelLoaded = true)} />
     </Canvas>
   </div>
+
+  <Dialog open={!modelLoaded} scrimClickAction="" escapeKeyAction="">
+    <Content class="modal_content">
+      <CircularProgress style="height: 3em; width: 3em; " indeterminate />
+      <span>Loading model</span>
+    </Content>
+    <!-- Dummy button to deal with focusTrap errors -->
+    <button style="opacity: 0; position: absolute" />
+  </Dialog>
 {:else}
   <Dialog open={!$mqttConnected} scrimClickAction="" escapeKeyAction="">
-    <Content style="display: flex; justify-content: center; padding: 2em;">
+    <Content class="modal_content">
       <CircularProgress style="height: 3em; width: 3em; " indeterminate />
+      <span>Connecting to MQTT...</span>
     </Content>
     <!-- Dummy button to deal with focusTrap errors -->
     <button style="opacity: 0; position: absolute" />
@@ -53,6 +65,15 @@
 
   :global(body) {
     margin: 0;
+  }
+
+  :global(.modal_content) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    padding: 2em;
   }
 
   .threejs_wrapper {
