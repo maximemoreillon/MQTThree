@@ -10,6 +10,8 @@
   } from "@threlte/extras";
   import Light from "./devices/Light.svelte";
   import Fan from "./devices/Fan.svelte";
+  import Sensor from "./devices/Sensor.svelte";
+  import Lock from "./devices/Lock.svelte";
   import { orbitControlsEnabled } from "$lib/states";
   import { Vector3 } from "three";
   import axios from "axios";
@@ -63,15 +65,19 @@
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
 {#each devices.filter(({ type }) => type === "light") as device}
-  <Light
-    commandTopic={device.commandTopic}
-    position={device.position}
-    topic={device.topic}
-  />
+  <Light {device} />
 {/each}
 
 {#each devices.filter(({ type }) => type === "fan") as device}
   <Fan {device} />
+{/each}
+
+{#each devices.filter(({ type }) => type === "sensor") as device}
+  <Sensor {device} />
+{/each}
+
+{#each devices.filter(({ type }) => type === "lock") as device}
+  <Lock {device} />
 {/each}
 
 <!-- TODO: loader -->

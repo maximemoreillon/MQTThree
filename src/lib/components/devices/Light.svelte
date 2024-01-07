@@ -9,43 +9,45 @@
 
   interactivity();
 
-  export let position: Vector3;
-  export let commandTopic: string;
-  export let topic: string;
+  export let device: any;
+
+  const payloadOn = device.payload?.on || "on";
+  const payloadOff = device.payload?.off || "off";
 
   const scale = 0.015;
 
-  let state: string = "off";
-  $: isOn = state.toLowerCase() === "on";
+  let state: string = payloadOff;
+  $: isOn = state.toLowerCase() === payloadOn;
   $: color = isOn ? "#ffff00" : "#ffffff";
   $: opacity = isOn ? 0.5 : 0.25;
 
   function handleClick() {
     // state = state == "on" ? "off" : "on"
     if (!client.isConnected()) return;
-    const payload = JSON.stringify({ state: "toggle" });
+    const targetState = state == payloadOn ? payloadOff : payloadOn;
+    const payload = JSON.stringify({ state: targetState });
     const message = new MQTT.Message(payload);
-    message.destinationName = commandTopic;
+    message.destinationName = device.commandTopic;
     client.send(message);
   }
 
   // TODO: subscribe if both mounted and mqtt connected
   onMount(() => {
     on("connected", () => {
-      client.subscribe(topic);
+      client.subscribe(device.topic);
     });
 
     on("message", (message: MQTT.Message) => {
-      if (message.destinationName !== topic) return;
+      if (message.destinationName !== device.topic) return;
       const payload = JSON.parse(message.payloadString);
       state = payload.state;
     });
 
-    if (client.isConnected()) client.subscribe(topic);
+    if (client.isConnected()) client.subscribe(device.topic);
   });
 </script>
 
-<T.Group position={position.toArray()}>
+<T.Group position={device.position.toArray()}>
   <!-- Hitbox -->
   <T.Mesh on:click={handleClick}>
     <T.SphereGeometry args={[0.25]} />

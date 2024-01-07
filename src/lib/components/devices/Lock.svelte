@@ -5,32 +5,19 @@
   import { client, on } from "$lib/mqtt";
   import MQTT from "paho-mqtt";
   import { onMount } from "svelte";
-  import FanModel from "./FanModel.svelte";
 
   interactivity();
 
   export let device: any;
 
-  const payloadOn = device.payload?.on || "on";
-  const payloadOff = device.payload?.off || "off";
-
-  const scale = 0.015;
-
-  let state: string = payloadOff;
-  $: isOn = state.toLowerCase() === payloadOn;
-  $: color = isOn ? "#00ff00" : "#ffffff";
+  let state: string = "unlocked";
+  $: isLocked = state.toLowerCase() === "locked";
+  $: color = isLocked ? "#00ff00" : "#ff0000";
   const opacity = 0.25;
 
-  let angle = 0;
-
-  setInterval(() => {
-    if (isOn) angle += 0.1;
-  }, 10);
-
   function handleClick() {
-    // state = state == "on" ? "off" : "on"
     if (!client.isConnected()) return;
-    const targetState = state == payloadOn ? payloadOff : payloadOn;
+    const targetState = isLocked ? "unlocked" : "locked";
     const payload = JSON.stringify({ state: targetState });
     const message = new MQTT.Message(payload);
     message.destinationName = device.commandTopic;
@@ -40,6 +27,7 @@
   // TODO: subscribe if both mounted and mqtt connected
   onMount(() => {
     on("connected", () => {
+      console.log(`Subscribing to ${device.topic}`);
       client.subscribe(device.topic);
     });
 
@@ -59,6 +47,4 @@
     <T.SphereGeometry args={[0.25]} />
     <T.MeshStandardMaterial transparent {opacity} {color} />
   </T.Mesh>
-
-  <FanModel {scale} rotation.x={angle} />
 </T.Group>
