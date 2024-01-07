@@ -19,19 +19,27 @@
       const { username, password } = data;
       mqttLogin(username, password);
     } catch (error) {
-      // TODO: navigate to login page
-      console.error(error);
       goto("/login");
     }
   });
 </script>
 
 <!-- TODO: check if mqtt is connected -->
-<div class="threejs_wrapper">
-  <Canvas>
-    <Scene />
-  </Canvas>
-</div>
+{#if $mqttConnected}
+  <div class="threejs_wrapper">
+    <Canvas>
+      <Scene />
+    </Canvas>
+  </div>
+{:else}
+  <Dialog open={!$mqttConnected} scrimClickAction="" escapeKeyAction="">
+    <Content style="display: flex; justify-content: center; padding: 2em;">
+      <CircularProgress style="height: 3em; width: 3em; " indeterminate />
+    </Content>
+    <!-- Dummy button to deal with focusTrap errors -->
+    <button style="opacity: 0; position: absolute" />
+  </Dialog>
+{/if}
 
 <Fab color="primary" href="/config" class="settings_button">
   <Icon class="material-icons">settings</Icon>

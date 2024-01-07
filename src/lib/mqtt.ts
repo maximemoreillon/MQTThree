@@ -26,11 +26,6 @@ export function init(){
 
   client.onMessageArrived = handleMessage
   client.onConnectionLost = handleConnectionLost
-
-  // TODO: login using credentials from the backend
-
-
-
 }
 
 export function on (event: string, callback: Function) {
