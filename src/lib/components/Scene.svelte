@@ -88,4 +88,5 @@
   castShadow
   receiveShadow
   on:load={() => dispatch("modelLoaded")}
+  on:error={() => dispatch("modelLoaded")}
 />

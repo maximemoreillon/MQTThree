@@ -5,6 +5,7 @@
   import { client, on } from "$lib/mqtt";
   import MQTT from "paho-mqtt";
   import { onMount } from "svelte";
+  import LockModel from "./LockModel.svelte";
 
   interactivity();
 
@@ -47,4 +48,5 @@
     <T.SphereGeometry args={[0.25]} />
     <T.MeshStandardMaterial transparent {opacity} {color} />
   </T.Mesh>
+  <LockModel scale={[0.06, 0.06, 0.06]} {color} />
 </T.Group>
