@@ -15,6 +15,7 @@ services:
 build:
   only:
     - master
+    - threlte
   stage: build
   tags:
     - dind

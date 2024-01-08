@@ -15,7 +15,7 @@
     canvas.height = 600;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    const fontSize = 80;
+    const fontSize = 100;
     const text = `${value} ${device.unit}`;
     const x = 0.5 * canvas.width;
     const y = 0.5 * canvas.height;
