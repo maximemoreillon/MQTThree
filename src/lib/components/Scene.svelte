@@ -87,6 +87,6 @@
   interactive
   castShadow
   receiveShadow
-  on:load={() => dispatch("modelLoaded")}
-  on:error={() => dispatch("modelLoaded")}
+  on:load={() => dispatch("modelLoad")}
+  on:error={() => dispatch("modelError")}
 />

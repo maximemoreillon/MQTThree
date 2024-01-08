@@ -1,5 +1,5 @@
 {
-  "name": "my-project",
+  "name": "mqtthree",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -27,6 +27,7 @@
     "@types/paho-mqtt": "^1.0.7",
     "@types/three": "^0.152.1",
     "@types/uuid": "^9.0.7",
+    "@vite-pwa/sveltekit": "^0.3.0",
     "smui-theme": "^7.0.0-beta.16",
     "svelte": "^4.0.5",
     "svelte-check": "^3.4.3",

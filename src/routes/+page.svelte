@@ -29,7 +29,10 @@
 {#if $mqttConnected}
   <div class="threejs_wrapper">
     <Canvas>
-      <Scene on:modelLoaded={() => (modelLoaded = true)} />
+      <Scene
+        on:modelLoad={() => (modelLoaded = true)}
+        on:modelError={() => (modelLoaded = true)}
+      />
     </Canvas>
   </div>
 
