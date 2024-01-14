@@ -12,13 +12,14 @@
   import Fan from "./devices/Fan.svelte";
   import Sensor from "./devices/Sensor.svelte";
   import Lock from "./devices/Lock.svelte";
-  import { orbitControlsEnabled } from "$lib/states";
+  import { orbitControlsEnabled } from "$lib/unused/states";
   import { Vector3 } from "three";
   import axios from "axios";
   import { onMount } from "svelte";
   import { createEventDispatcher } from "svelte";
 
   const modelPath = "/api/model";
+  // const modelPath = "/test/model.glb";
   const dispatch = createEventDispatcher();
 
   interactivity();
@@ -44,7 +45,6 @@
   <OrbitControls enabled={$orbitControlsEnabled} />
 </T.PerspectiveCamera>
 
-<!-- <T.DirectionalLight intensity={0.8} position.x={5} position.y={10} /> -->
 <T.AmbientLight intensity={0.2} />
 
 <Grid

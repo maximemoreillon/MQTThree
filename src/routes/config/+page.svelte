@@ -1,3 +1,4 @@
+<!-- PROBLEM: This page can be accessed without being authenticated -->
 <script lang="ts">
   import ModelUploadForm from "$lib/components/ModelUploadForm.svelte";
   import ConfigUploadForm from "$lib/components/ConfigUploadForm.svelte";

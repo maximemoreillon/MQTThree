@@ -5,13 +5,13 @@ import jwt from 'jsonwebtoken'
 
 const {MQTT_USERNAME, MQTT_PASSWORD, JWT_SECRET} = env
 
+// TODO: How does this only handle POST Requests?
 export const actions: Actions = {
     default: async ({ request, cookies }) => {
 
       const formData = await request.formData();
       const username = formData.get('username');
       const password = formData.get('password');
-
 
       if (username !== MQTT_USERNAME || password !== MQTT_PASSWORD) return fail(401, {message: 'Access denied'})
 

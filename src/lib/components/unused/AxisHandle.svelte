@@ -2,7 +2,7 @@
   import { T } from "@threlte/core";
   import { interactivity, Grid } from "@threlte/extras";
   import type { Vector3 } from "three";
-  import { orbitControlsEnabled } from "$lib/states";
+  import { orbitControlsEnabled } from "$lib/unused/states";
 
   addEventListener("mouseup", () => {
     orbitControlsEnabled.set(true);

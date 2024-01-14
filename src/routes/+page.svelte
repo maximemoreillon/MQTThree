@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Canvas } from "@threlte/core";
   import Scene from "$lib/components/Scene.svelte";
-  import { orbitControlsEnabled, createMode } from "$lib/states";
+  import { orbitControlsEnabled, createMode } from "$lib/unused/states";
   import { connected as mqttConnected } from "$lib/mqtt";
   import Fab, { Icon } from "@smui/fab";
   import Dialog, { Content, Actions } from "@smui/dialog";
@@ -13,17 +13,6 @@
   import axios from "axios";
 
   let modelLoaded = false;
-
-  onMount(async () => {
-    if ($mqttConnected) return;
-    try {
-      const { data } = await axios.get("/api/mqttcredentials");
-      const { username, password } = data;
-      mqttLogin(username, password);
-    } catch (error) {
-      goto("/login");
-    }
-  });
 </script>
 
 {#if $mqttConnected}
@@ -39,7 +28,7 @@
   <Dialog open={!modelLoaded} scrimClickAction="" escapeKeyAction="">
     <Content class="modal_content">
       <CircularProgress style="height: 3em; width: 3em; " indeterminate />
-      <span>Loading model</span>
+      <span>Loading model...</span>
     </Content>
     <!-- Dummy button to deal with focusTrap errors -->
     <button style="opacity: 0; position: absolute" />

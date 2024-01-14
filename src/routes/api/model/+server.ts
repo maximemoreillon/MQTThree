@@ -2,6 +2,8 @@ import fs from 'fs'
 import path from 'path'
 
 const modelDirectory = './config'
+// PROBLEM: model folder needs to be resolved somehow
+// const modelDirectory = 'static/test'
 const modelFileName = 'model.glb'
 
 export async function GET(){
@@ -16,15 +18,13 @@ export async function GET(){
 export async function POST({ request }){
   const formData = Object.fromEntries(await request.formData());
 
-    if ( !formData.model) {
-      throw 'No model'
-    }
-
+    if ( !formData.model) throw 'No model'
+    
     fs.mkdirSync(modelDirectory, { recursive: true });
 
     const { model } = formData as { model: File };
 
     const modelPath = path.join(modelDirectory,modelFileName)
     fs.writeFileSync(modelPath, Buffer.from(await model.arrayBuffer()));
-  return new Response("hi")
+  return new Response("OK")
 }

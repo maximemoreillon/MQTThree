@@ -28,6 +28,8 @@ export function init(){
   client.onConnectionLost = handleConnectionLost
 }
 
+// Custom event dispatcher
+// TODO: Check if this is used
 export function on (event: string, callback: Function) {
   eventHandlers.push({event, callback})
 }
