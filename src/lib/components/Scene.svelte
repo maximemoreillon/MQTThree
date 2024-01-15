@@ -80,8 +80,6 @@
   <Lock {device} />
 {/each}
 
-<!-- TODO: loader -->
-<!-- PROBLEM: might need preparation with  npx @threlte/gltf@1.0.1 light.glb --transform -->
 <GLTF
   url={modelPath}
   interactive

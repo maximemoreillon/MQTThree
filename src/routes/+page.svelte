@@ -27,7 +27,7 @@
 
   <Dialog open={!modelLoaded} scrimClickAction="" escapeKeyAction="">
     <Content class="modal_content">
-      <CircularProgress style="height: 3em; width: 3em; " indeterminate />
+      <CircularProgress style="height: 3em; width: 3em;" indeterminate />
       <span>Loading model...</span>
     </Content>
     <!-- Dummy button to deal with focusTrap errors -->

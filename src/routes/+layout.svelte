@@ -9,8 +9,9 @@
   import axios from "axios";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
+  import CircularProgress from "@smui/circular-progress";
 
-  let authenticating = false;
+  let authenticating = true;
 
   onMount(async () => {
     mqttInit();
@@ -30,12 +31,9 @@
     }
   }
 
-  $: if (browser && $page.url.pathname !== "/login") {
-    enforeAuth();
-  }
-
-  // TODO: have a navigation guard here
+  // Watching pathname
+  $: if (browser && $page.url.pathname !== "/login") enforeAuth();
 </script>
 
-<!-- TODO: consider having an Auth wall here -->
+<!-- TODO: have an app wall here -->
 <slot />

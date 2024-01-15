@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 
 const {MQTT_USERNAME, MQTT_PASSWORD, JWT_SECRET} = env
 
-// TODO: How does this only handle POST Requests?
+// NOTE: Actions always use POST requests
 export const actions: Actions = {
     default: async ({ request, cookies }) => {
 
