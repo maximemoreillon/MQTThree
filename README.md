@@ -1,16 +1,6 @@
-# MQTThree
+# MQTTHree
 
-MQTT + Three.js
-
-## Usage
-
-This application can be run as a Docker container:
-
-```bash
-docker run \
-  -p 8080:3000 \
-  -e NUXT_PUBLIC_MQTT_HOST=your-mqtt-host \
-  -e NUXT_PUBLIC_MQTT_PORT=your-mqtt-port \
-  -v local-config-path:/app/config \
-  moreillon/mqtthree:latest
-```
+## References
+[How to implement file upload with SvelteKit](https://www.okupter.com/blog/sveltekit-file-upload)
+[File download from SvelteKit](https://stackoverflow.com/questions/75327063/sveltekit-endpoint-that-returns-a-file-for-a-file-sharing-website)
+[Authentication](https://stackoverflow.com/questions/74256446/how-do-i-create-a-cookie-in-svelte-and-access-it)

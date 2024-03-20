@@ -10,11 +10,12 @@ variables:
 
 image: moreillon/ci-dind
 services:
-  - name: docker:19.03.12-dind
+  - name: docker:24.0.7-dind
 
 build:
   only:
     - master
+    - threlte
   stage: build
   tags:
     - dind
