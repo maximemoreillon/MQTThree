@@ -28,6 +28,9 @@ spec:
           image: ${CONTAINER_IMAGE_TAGGED}
           ports:
             - containerPort: 3000
+          env:
+            - name: BODY_SIZE_LIMIT
+              value: disabled
           envFrom:
             - secretRef:
                 name: mqtthree
@@ -60,6 +63,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/proxy-body-size: 5g
     nginx/client_max_body_size: 5g
+
 
 spec:
   tls:
