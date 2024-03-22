@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@smui/button": "^7.0.0-beta.16",
+    "@smui/circular-progress": "^7.0.0-beta.16",
     "@smui/dialog": "^7.0.0-beta.16",
     "@smui/fab": "^7.0.0-beta.16",
     "@smui/textfield": "^7.0.0-beta.16",
@@ -38,7 +39,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@smui/circular-progress": "^7.0.0-beta.16",
     "axios": "^1.5.0",
     "jsonwebtoken": "^9.0.2",
     "paho-mqtt": "^1.1.0",
