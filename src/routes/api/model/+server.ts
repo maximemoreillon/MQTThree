@@ -11,7 +11,9 @@ export async function GET(){
   const modelPath = path.join(modelDirectory, modelFileName)
 
   const data = await fs.promises.readFile(modelPath)
-  return new Response(data)
+  const response = new Response(data)
+  response.headers.set('Cache-control', 'max-age=604800')
+  return response
 }
 
 
