@@ -2,7 +2,6 @@ import { writable } from 'svelte/store';
 import MQTT from 'paho-mqtt';
 import { v4 as uuidv4 } from 'uuid';
 import {env} from '$env/dynamic/public'
-import axios from 'axios'
 const eventHandlers: {event: string, callback: Function}[] = []
 
 const {

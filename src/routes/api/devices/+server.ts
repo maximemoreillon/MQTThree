@@ -2,10 +2,9 @@ import { json } from '@sveltejs/kit'
 import fs from 'fs'
 import path from 'path'
 import YAML from 'yaml'
+import { configDir, devicesFileName } from '$lib/config.js'
 
-const dir = './config'
-const filename = 'devices.yml'
-const filePath = path.join(dir, filename)
+const filePath = path.join(configDir, devicesFileName)
 
 export async function GET(){
 
@@ -15,12 +14,13 @@ export async function GET(){
   return json(devices)
 }
 
+// TODO: transform this into a form action
 export async function POST({ request }){
   const formData = Object.fromEntries(await request.formData());
 
     if ( !formData.devices) throw 'No devices'
 
-    fs.mkdirSync(dir, { recursive: true });
+    fs.mkdirSync(configDir, { recursive: true });
 
     const { devices } = formData ;
 
