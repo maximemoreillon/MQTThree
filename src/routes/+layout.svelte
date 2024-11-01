@@ -9,7 +9,6 @@
   import axios from "axios";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
-  import CircularProgress from "@smui/circular-progress";
 
   let authenticating = true;
 

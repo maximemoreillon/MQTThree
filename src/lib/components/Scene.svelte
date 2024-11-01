@@ -19,7 +19,6 @@
   import { createEventDispatcher } from "svelte";
 
   const modelPath = "/api/model";
-  // const modelPath = "/test/model.glb";
   const dispatch = createEventDispatcher();
 
   interactivity();

@@ -15,6 +15,7 @@ export const actions: Actions = {
 
       if (username !== MQTT_USERNAME || password !== MQTT_PASSWORD) return fail(401, {message: 'Access denied'})
 
+
       const cookiesOptions = { 
         path: '/', 
         maxAge: 60 * 60 * 24 * 365, 
