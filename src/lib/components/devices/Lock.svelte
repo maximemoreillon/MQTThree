@@ -2,7 +2,7 @@
   import { T } from "@threlte/core";
   import { interactivity } from "@threlte/extras";
   import type { Vector3 } from "three";
-  import { client, on } from "$lib/mqtt";
+  import { client, on, connected } from "$lib/mqtt";
   import MQTT from "paho-mqtt";
   import { onMount } from "svelte";
   import LockModel from "./LockModel.svelte";
@@ -28,17 +28,17 @@
   // TODO: subscribe if both mounted and mqtt connected
   onMount(() => {
     on("connected", () => {
-      console.log(`Subscribing to ${device.topic}`);
       client.subscribe(device.topic);
     });
+    if (client.isConnected()) {
+      client.subscribe(device.topic);
+    }
 
     on("message", (message: MQTT.Message) => {
       if (message.destinationName !== device.topic) return;
       const payload = JSON.parse(message.payloadString);
       state = payload.state;
     });
-
-    if (client.isConnected()) client.subscribe(device.topic);
   });
 </script>
 

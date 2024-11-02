@@ -50,14 +50,17 @@ function onFailure(error: MQTT.ErrorWithInvocationContext) {
 
 function onSuccess() {
   // TODO: check if reconnection
-  connected.set(true)
-  eventHandlers
+
+    connected.set(true)
+    eventHandlers
     .filter(({event}: any) => event === 'connected')
     .forEach(({callback}:any) => callback())
+  
 }
 
-export function login(userName: string, password: string) {
-  const connectionOptions = {
+export const login = (userName: string, password: string) => 
+
+  client.connect({
     onSuccess,
     onFailure,
     userName,
@@ -65,8 +68,5 @@ export function login(userName: string, password: string) {
     useSSL: !!PUBLIC_MQTT_USE_SSL,
     keepAliveInterval: 30,
     reconnect: true,
-  };
+  })
 
-  client.connect(connectionOptions);
-
-}

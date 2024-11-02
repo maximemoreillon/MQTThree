@@ -1,8 +1,9 @@
 import path from 'path'
 import { configDir, devicesFileName, modelFileName } from '$lib/config.js'
-import { checkAuth } from '$lib/auth';
+import { redirectIfUnauthorized } from '$lib/auth';
 import {writeFileSync} from 'fs'
 import type { Actions } from './$types';
+import { redirect } from '@sveltejs/kit';
 
 const configPath = path.join(configDir, devicesFileName)
 const modelPath = path.join(configDir, modelFileName)
@@ -12,7 +13,7 @@ export const actions: Actions = {
 
     modelUpload: async (event) => {
 
-      checkAuth(event)
+      await redirectIfUnauthorized(event)
       const formData = await event.request.formData()
 
       const file = formData.get('model') as File
@@ -25,7 +26,8 @@ export const actions: Actions = {
     configUpload: async (event) => {
 
 
-      checkAuth(event)
+      await redirectIfUnauthorized(event)
+
       const formData = await event.request.formData()
 
       const file = formData.get('config') as File

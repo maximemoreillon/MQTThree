@@ -1,14 +1,25 @@
 <script lang="ts">
   import { Canvas } from "@threlte/core";
   import Scene from "$lib/components/Scene.svelte";
-  import { connected as mqttConnected } from "$lib/mqtt";
   import Fab, { Icon } from "@smui/fab";
   import Dialog, { Content } from "@smui/dialog";
   import CircularProgress from "@smui/circular-progress";
+  import { onMount } from "svelte";
+  import {
+    init as mqttInit,
+    login as mqttLogin,
+    connected as mqttConnected,
+  } from "$lib/mqtt";
 
   let modelLoaded = false;
 
   export let data;
+
+  onMount(() => {
+    mqttInit();
+    const { username, password } = data.mqttCredentials;
+    mqttLogin(username, password);
+  });
 </script>
 
 {#if $mqttConnected}
