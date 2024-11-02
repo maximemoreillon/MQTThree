@@ -6,7 +6,8 @@
   import Icon from "@smui/textfield/icon";
 </script>
 
-<form method="post" use:enhance>
+<form method="POST" use:enhance>
+  <h3>Login</h3>
   <Textfield label="Username" input$name="username" value="">
     <Icon class="material-icons" slot="leadingIcon">person</Icon>
   </Textfield>
@@ -21,7 +22,7 @@
 
 <style>
   form {
-    margin-top: 25vh;
+    margin-top: 4rem;
     display: flex;
     flex-direction: column;
     max-width: 20rem;

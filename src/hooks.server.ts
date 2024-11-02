@@ -4,6 +4,7 @@ import { error } from '@sveltejs/kit';
 export async function handle({ event, resolve }) {
 
 	if (event.url.pathname.startsWith('/api')) {
+
 		// TODO: error handling
 		try {
 			await checkAuth(event)

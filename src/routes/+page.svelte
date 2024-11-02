@@ -1,24 +1,21 @@
 <script lang="ts">
   import { Canvas } from "@threlte/core";
   import Scene from "$lib/components/Scene.svelte";
-  import { orbitControlsEnabled, createMode } from "$lib/unused/states";
   import { connected as mqttConnected } from "$lib/mqtt";
   import Fab, { Icon } from "@smui/fab";
-  import Dialog, { Content, Actions } from "@smui/dialog";
+  import Dialog, { Content } from "@smui/dialog";
   import CircularProgress from "@smui/circular-progress";
-  import { goto } from "$app/navigation";
-
-  import { login as mqttLogin } from "$lib/mqtt";
-  import { onMount } from "svelte";
-  import axios from "axios";
 
   let modelLoaded = false;
+
+  export let data;
 </script>
 
 {#if $mqttConnected}
   <div class="threejs_wrapper">
     <Canvas>
       <Scene
+        devices={data.devices}
         on:modelLoad={() => (modelLoaded = true)}
         on:modelError={() => (modelLoaded = true)}
       />

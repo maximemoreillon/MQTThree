@@ -14,8 +14,7 @@
   import Lock from "./devices/Lock.svelte";
   import { orbitControlsEnabled } from "$lib/unused/states";
   import { Vector3 } from "three";
-  import axios from "axios";
-  import { onMount } from "svelte";
+
   import { createEventDispatcher } from "svelte";
 
   const modelPath = "/api/model";
@@ -23,14 +22,12 @@
 
   interactivity();
 
-  let devices: any[] = [];
-  onMount(async () => {
-    const { data } = await axios.get("/api/devices");
-    devices = data.map((d: any) => ({
-      ...d,
-      position: new Vector3(d.position.x, d.position.y, d.position.z),
-    }));
-  });
+  export let devices: any[] = [];
+
+  $: formattedDevices = devices.map((d: any) => ({
+    ...d,
+    position: new Vector3(d.position.x, d.position.y, d.position.z),
+  }));
 </script>
 
 <T.PerspectiveCamera
@@ -63,19 +60,19 @@
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
-{#each devices.filter(({ type }) => type === "light") as device}
+{#each formattedDevices.filter(({ type }) => type === "light") as device}
   <Light {device} />
 {/each}
 
-{#each devices.filter(({ type }) => type === "fan") as device}
+{#each formattedDevices.filter(({ type }) => type === "fan") as device}
   <Fan {device} />
 {/each}
 
-{#each devices.filter(({ type }) => type === "sensor") as device}
+{#each formattedDevices.filter(({ type }) => type === "sensor") as device}
   <Sensor {device} />
 {/each}
 
-{#each devices.filter(({ type }) => type === "lock") as device}
+{#each formattedDevices.filter(({ type }) => type === "lock") as device}
   <Lock {device} />
 {/each}
 

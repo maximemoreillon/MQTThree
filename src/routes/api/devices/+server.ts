@@ -1,3 +1,5 @@
+// This is unused
+
 import { json } from '@sveltejs/kit'
 import fs from 'fs'
 import path from 'path'
@@ -14,17 +16,3 @@ export async function GET(){
   return json(devices)
 }
 
-// TODO: transform this into a form action
-export async function POST({ request }){
-  const formData = Object.fromEntries(await request.formData());
-
-    if ( !formData.devices) throw 'No devices'
-
-    fs.mkdirSync(configDir, { recursive: true });
-
-    const { devices } = formData ;
-
-    // @ts-ignore
-    fs.writeFileSync(filePath, Buffer.from(await devices.arrayBuffer()));
-  return new Response("hi")
-}

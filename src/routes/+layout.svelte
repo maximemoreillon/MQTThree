@@ -6,7 +6,6 @@
   } from "$lib/mqtt";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
-  import axios from "axios";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
 
@@ -20,7 +19,9 @@
     if ($mqttConnected) return;
     try {
       authenticating = true;
-      const { data } = await axios.get("/api/mqttcredentials");
+
+      const response = await fetch("/api/mqttcredentials");
+      const data = await response.json();
       const { username, password } = data;
       mqttLogin(username, password);
     } catch (error) {
