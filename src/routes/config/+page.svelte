@@ -62,8 +62,6 @@
 
   form input[type="file"] {
     flex-grow: 1;
-    border: 1px solid white;
-    padding: 1em;
     border-radius: 0.5em;
     cursor: pointer;
   }
