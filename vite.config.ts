@@ -6,7 +6,10 @@ export default defineConfig({
 	plugins: [
 		sveltekit(),
 		SvelteKitPWA(
-			{ registerType: 'autoUpdate' }
+			{ 
+				registerType: 'autoUpdate',
+				injectRegister: 'auto' // Optional according to https://vite-pwa-org.netlify.app/guide/register-service-worker.html
+			}
 		)
 	],
 	ssr: {
