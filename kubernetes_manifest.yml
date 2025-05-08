@@ -26,15 +26,12 @@ spec:
       containers:
         - name: ${APPLICATION_NAME}
           image: ${CONTAINER_IMAGE_TAGGED}
-          ports:
-            - containerPort: 3000
           env:
             - name: BODY_SIZE_LIMIT
               value: disabled
           envFrom:
             - secretRef:
                 name: mqtthree
-
           volumeMounts:
             - mountPath: /app/config
               name: ${APPLICATION_NAME}
@@ -49,35 +46,34 @@ kind: Service
 metadata:
   name: ${APPLICATION_NAME}
 spec:
-  type: ClusterIP
+  # type: ClusterIP
+  type: NodePort
   selector:
     app: ${APPLICATION_NAME}
   ports:
     - port: 3000
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ${APPLICATION_NAME}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-    nginx.ingress.kubernetes.io/proxy-body-size: 5g
-    nginx/client_max_body_size: 5g
-
-
-spec:
-  tls:
-    - hosts:
-        - ${K8S_INGRESS_HOST}
-      secretName: ${APPLICATION_NAME}-tls
-  rules:
-    - host: ${K8S_INGRESS_HOST}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ${APPLICATION_NAME}
-                port:
-                  number: 3000
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: ${APPLICATION_NAME}
+#   annotations:
+#     cert-manager.io/cluster-issuer: letsencrypt
+#     nginx.ingress.kubernetes.io/proxy-body-size: 5g
+#     nginx/client_max_body_size: 5g
+# spec:
+#   tls:
+#     - hosts:
+#         - ${K8S_INGRESS_HOST}
+#       secretName: ${APPLICATION_NAME}-tls
+#   rules:
+#     - host: ${K8S_INGRESS_HOST}
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: ${APPLICATION_NAME}
+#                 port:
+#                   number: 3000
