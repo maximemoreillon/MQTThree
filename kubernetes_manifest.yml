@@ -47,7 +47,6 @@ metadata:
   name: ${APPLICATION_NAME}
 spec:
   type: ClusterIP
-  # type: NodePort
   selector:
     app: ${APPLICATION_NAME}
   ports:
