@@ -13,12 +13,9 @@ services:
   - name: docker:24.0.7-dind
 
 build:
+  stage: build
   only:
     - master
-    - threlte
-  stage: build
-  tags:
-    - dind
   before_script:
     - echo "${DOCKER_HUB_PASSWORD}" | docker login --username ${DOCKER_HUB_USERNAME} --password-stdin
   script:
@@ -31,11 +28,9 @@ build:
     - docker push ${CONTAINER_IMAGE_TAGGED}
 
 deploy:
+  stage: deploy
   only:
     - master
-  stage: deploy
-  tags:
-    - dind
   before_script:
     - kubectl config use-context moreillon_ci/moreillon_k8s_home/kubernetes-agent:home-talos
   script:
