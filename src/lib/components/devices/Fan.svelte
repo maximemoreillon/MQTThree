@@ -2,7 +2,7 @@
 	import { T, useTask } from '@threlte/core';
 	import { onMount } from 'svelte';
 	import { publish, subscribe } from '#lib/mqtt.svelte.ts';
-	import { getState, toArray, type FanDevice } from '#lib/devices.ts';
+	import { getState, sameState, toArray, toRotation, type FanDevice } from '#lib/devices.ts';
 	import FanModel from './FanModel.svelte';
 
 	let { device }: { device: FanDevice } = $props();
@@ -14,7 +14,7 @@
 	const payloadOff = $derived(device.payload?.off ?? 'off');
 
 	let deviceState = $state<string | undefined>();
-	const isOn = $derived(deviceState?.toLowerCase() === payloadOn);
+	const isOn = $derived(sameState(deviceState, payloadOn));
 	const color = $derived(isOn ? '#00ff00' : '#ffffff');
 
 	let angle = $state(0);
@@ -34,7 +34,7 @@
 	);
 </script>
 
-<T.Group position={toArray(device.position)}>
+<T.Group position={toArray(device.position)} rotation={toRotation(device.rotation)}>
 	<!-- Hitbox -->
 	<T.Mesh onclick={handleClick}>
 		<T.SphereGeometry args={[0.25]} />

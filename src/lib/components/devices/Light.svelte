@@ -2,7 +2,7 @@
 	import { T } from '@threlte/core';
 	import { onMount } from 'svelte';
 	import { publish, subscribe } from '#lib/mqtt.svelte.ts';
-	import { getState, toArray, type LightDevice } from '#lib/devices.ts';
+	import { getState, sameState, toArray, toRotation, type LightDevice } from '#lib/devices.ts';
 	import LightModel from './LightModel.svelte';
 
 	let { device }: { device: LightDevice } = $props();
@@ -12,7 +12,7 @@
 	const payloadOff = $derived(device.payload?.off ?? 'off');
 
 	let deviceState = $state<string | undefined>();
-	const isOn = $derived(deviceState?.toLowerCase() === payloadOn);
+	const isOn = $derived(sameState(deviceState, payloadOn));
 	const color = $derived(isOn ? '#ffff00' : '#ffffff');
 	const opacity = $derived(isOn ? 0.5 : 0.25);
 
@@ -28,7 +28,7 @@
 	);
 </script>
 
-<T.Group position={toArray(device.position)}>
+<T.Group position={toArray(device.position)} rotation={toRotation(device.rotation)}>
 	<!-- Hitbox -->
 	<T.Mesh onclick={handleClick}>
 		<T.SphereGeometry args={[0.25]} />

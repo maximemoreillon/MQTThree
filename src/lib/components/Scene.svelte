@@ -8,8 +8,11 @@
 	import Sensor from './devices/Sensor.svelte';
 	import Lock from './devices/Lock.svelte';
 
-	let { onModelLoad, onModelError }: { onModelLoad?: () => void; onModelError?: () => void } =
-		$props();
+	let {
+		onModelLoad,
+		onModelError,
+		onDevicesError
+	}: { onModelLoad?: () => void; onModelError?: () => void; onDevicesError?: () => void } = $props();
 
 	const modelPath = '/api/model';
 
@@ -18,8 +21,14 @@
 	let devices = $state<Device[]>([]);
 
 	onMount(async () => {
-		const response = await fetch('/api/devices');
-		if (response.ok) devices = await response.json();
+		try {
+			const response = await fetch('/api/devices');
+			if (!response.ok) throw new Error(`Failed to fetch devices (${response.status})`);
+			devices = await response.json();
+		} catch (error) {
+			console.error(error);
+			onDevicesError?.();
+		}
 	});
 </script>
 
