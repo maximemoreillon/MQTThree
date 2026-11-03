@@ -1,64 +1,45 @@
 <script lang="ts">
-  import { T } from "@threlte/core";
-  import { interactivity } from "@threlte/extras";
-  import type { Vector3 } from "three";
-  import { client, on } from "$lib/mqtt";
-  import MQTT from "paho-mqtt";
-  import { onMount } from "svelte";
-  import FanModel from "./FanModel.svelte";
+	import { T, useTask } from '@threlte/core';
+	import { onMount } from 'svelte';
+	import { publish, subscribe } from '#lib/mqtt.svelte.ts';
+	import { getState, toArray, type FanDevice } from '#lib/devices.ts';
+	import FanModel from './FanModel.svelte';
 
-  interactivity();
+	let { device }: { device: FanDevice } = $props();
 
-  export let device: any;
+	const scale = 0.015;
+	const opacity = 0.25;
+	const rotationSpeed = 10; // rad/s
+	const payloadOn = $derived(device.payload?.on ?? 'on');
+	const payloadOff = $derived(device.payload?.off ?? 'off');
 
-  const payloadOn = device.payload?.on || "on";
-  const payloadOff = device.payload?.off || "off";
+	let deviceState = $state<string | undefined>();
+	const isOn = $derived(deviceState?.toLowerCase() === payloadOn);
+	const color = $derived(isOn ? '#00ff00' : '#ffffff');
 
-  const scale = 0.015;
+	let angle = $state(0);
+	useTask((delta) => {
+		if (isOn) angle += rotationSpeed * delta;
+	});
 
-  let state: string = payloadOff;
-  $: isOn = state.toLowerCase() === payloadOn;
-  $: color = isOn ? "#00ff00" : "#ffffff";
-  const opacity = 0.25;
+	function handleClick() {
+		const targetState = isOn ? payloadOff : payloadOn;
+		publish(device.commandTopic, JSON.stringify({ state: targetState }));
+	}
 
-  let angle = 0;
-
-  setInterval(() => {
-    if (isOn) angle += 0.1;
-  }, 10);
-
-  function handleClick() {
-    // state = state == "on" ? "off" : "on"
-    if (!client.isConnected()) return;
-    const targetState = state == payloadOn ? payloadOff : payloadOn;
-    const payload = JSON.stringify({ state: targetState });
-    const message = new MQTT.Message(payload);
-    message.destinationName = device.commandTopic;
-    client.send(message);
-  }
-
-  // TODO: subscribe if both mounted and mqtt connected
-  onMount(() => {
-    on("connected", () => {
-      client.subscribe(device.topic);
-    });
-
-    on("message", (message: MQTT.Message) => {
-      if (message.destinationName !== device.topic) return;
-      const payload = JSON.parse(message.payloadString);
-      state = payload.state;
-    });
-
-    if (client.isConnected()) client.subscribe(device.topic);
-  });
+	onMount(() =>
+		subscribe(device.topic, (payload) => {
+			deviceState = getState(payload) ?? deviceState;
+		})
+	);
 </script>
 
-<T.Group position={device.position.toArray()}>
-  <!-- Hitbox -->
-  <T.Mesh on:click={handleClick}>
-    <T.SphereGeometry args={[0.25]} />
-    <T.MeshStandardMaterial transparent {opacity} {color} />
-  </T.Mesh>
+<T.Group position={toArray(device.position)}>
+	<!-- Hitbox -->
+	<T.Mesh onclick={handleClick}>
+		<T.SphereGeometry args={[0.25]} />
+		<T.MeshStandardMaterial transparent {opacity} {color} />
+	</T.Mesh>
 
-  <FanModel {scale} rotation.x={angle} />
+	<FanModel {scale} rotation.x={angle} />
 </T.Group>

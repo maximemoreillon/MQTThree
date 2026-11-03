@@ -1,12 +1,9 @@
-import {env} from "$env/dynamic/private"
-import { json } from '@sveltejs/kit'
+import { json } from '@sveltejs/kit';
+import { MQTT_PASSWORD, MQTT_USERNAME } from '$app/env/private';
 
-const {MQTT_USERNAME, MQTT_PASSWORD} = env
-
-export async function GET(){
-
-  return json({
-    username: MQTT_USERNAME, 
-    password: MQTT_PASSWORD
-  })
+export async function GET() {
+	return json({
+		username: MQTT_USERNAME,
+		password: MQTT_PASSWORD
+	});
 }

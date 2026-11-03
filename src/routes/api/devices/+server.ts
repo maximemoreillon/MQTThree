@@ -1,31 +1,22 @@
-import { json } from '@sveltejs/kit'
-import fs from 'fs'
-import path from 'path'
-import YAML from 'yaml'
+import { error, json } from '@sveltejs/kit';
+import fs from 'node:fs';
+import path from 'node:path';
+import YAML from 'yaml';
 
-const dir = './config'
-const filename = 'devices.yml'
-const filePath = path.join(dir, filename)
+const dir = './config';
+const filePath = path.join(dir, 'devices.yml');
 
-export async function GET(){
-
-  const file = fs.readFileSync(filePath, 'utf8')
-  const devices = YAML.parse(file)
-
-  return json(devices)
+export async function GET() {
+	const file = await fs.promises.readFile(filePath, 'utf8');
+	return json(YAML.parse(file));
 }
 
-export async function POST({ request }){
-  const formData = Object.fromEntries(await request.formData());
+export async function POST({ request }) {
+	const devices = (await request.formData()).get('devices');
+	if (!(devices instanceof File)) error(400, 'No devices file');
 
-    if ( !formData.devices) {
-      throw 'No devices'
-    }
+	await fs.promises.mkdir(dir, { recursive: true });
+	await fs.promises.writeFile(filePath, Buffer.from(await devices.arrayBuffer()));
 
-    fs.mkdirSync(dir, { recursive: true });
-
-    const { devices } = formData as { devices: File };
-
-    fs.writeFileSync(filePath, Buffer.from(await devices.arrayBuffer()));
-  return new Response("hi")
+	return new Response('OK');
 }

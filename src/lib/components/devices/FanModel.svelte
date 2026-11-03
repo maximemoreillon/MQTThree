@@ -6,31 +6,26 @@ License: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
 Source: https://sketchfab.com/3d-models/propeller-polygon-04425ab580f04d70a87290ff13c7da4d
 Title: Propeller Polygon
 -->
+<script lang="ts">
+	import type * as THREE from 'three';
+	import { Group } from 'three';
+	import { T, type Props } from '@threlte/core';
+	import { useDraco, useGltf } from '@threlte/extras';
 
-<script>
-  import { Group } from "three";
-  import { T, forwardEventHandlers } from "@threlte/core";
-  import { useGltf } from "@threlte/extras";
+	let { children, ...props }: Props<THREE.Group> = $props();
 
-  export const ref = new Group();
-
-  const gltf = useGltf("/models/fan-transformed.glb", { useDraco: true });
-
-  const component = forwardEventHandlers();
+	const ref = new Group();
+	const gltf = useGltf('/models/fan-transformed.glb', { dracoLoader: useDraco() });
 </script>
 
-<T is={ref} dispose={false} {...$$restProps} bind:this={$component}>
-  {#await gltf}
-    <slot name="fallback" />
-  {:then gltf}
-    <T.Mesh
-      geometry={gltf.nodes.Object_2.geometry}
-      material={gltf.materials.initialShadingGroup}
-      rotation={[0, 0, -Math.PI / 2]}
-    />
-  {:catch error}
-    <slot name="error" {error} />
-  {/await}
+<T is={ref} dispose={false} {...props}>
+	{#await gltf then gltf}
+		<T.Mesh
+			geometry={gltf.nodes.Object_2.geometry}
+			material={gltf.materials.initialShadingGroup}
+			rotation={[0, 0, -Math.PI / 2]}
+		/>
+	{/await}
 
-  <slot {ref} />
+	{@render children?.({ ref })}
 </T>

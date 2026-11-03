@@ -1,19 +1,24 @@
-import {checkAuth} from '$lib/auth'
 import { error } from '@sveltejs/kit';
+import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
+import { JWT_SECRET, MQTT_PASSWORD, MQTT_USERNAME } from '$app/env/private';
+import { checkAuth } from '#lib/auth.ts';
 
-export async function handle({ event, resolve }) {
+export const init: ServerInit = () => {
+	const missing = Object.entries({ MQTT_USERNAME, MQTT_PASSWORD, JWT_SECRET })
+		.filter(([, value]) => !value)
+		.map(([name]) => name);
+	if (missing.length) throw new Error(`Missing environment variables: ${missing.join(', ')}`);
+};
 
+export const handle: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith('/api')) {
-		// TODO: error handling
 		try {
-			await checkAuth(event)
-		} catch (err) {
+			checkAuth(event);
+		} catch {
 			// TODO: consider redirecting
-			throw error(401, {message: 'You shall not pass!'})
+			error(401, 'You shall not pass!');
 		}
-	  return await resolve(event);;
 	}
 
-
-	return await resolve(event);
-}
+	return resolve(event);
+};
