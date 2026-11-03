@@ -8,8 +8,8 @@
 	let { device }: { device: LightDevice } = $props();
 
 	const scale = 0.015;
-	const payloadOn = $derived(device.payload?.on ?? 'on');
-	const payloadOff = $derived(device.payload?.off ?? 'off');
+	const payloadOn = $derived(device.payload.on);
+	const payloadOff = $derived(device.payload.off);
 
 	let deviceState = $state<string | undefined>();
 	const isOn = $derived(sameState(deviceState, payloadOn));

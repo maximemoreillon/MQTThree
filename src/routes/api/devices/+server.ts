@@ -1,22 +1,18 @@
 import { error, json } from '@sveltejs/kit';
-import fs from 'node:fs';
-import path from 'node:path';
-import YAML from 'yaml';
-
-const dir = './config';
-const filePath = path.join(dir, 'devices.yml');
+import { readDevices, writeDevices } from '#lib/server/devices.ts';
 
 export async function GET() {
-	const file = await fs.promises.readFile(filePath, 'utf8');
-	return json(YAML.parse(file));
+	const result = await readDevices();
+	if (!result.ok) return json({ message: `devices.yml is invalid:\n${result.message}` }, { status: 500 });
+	return json(result.devices);
 }
 
 export async function POST({ request }) {
-	const devices = (await request.formData()).get('devices');
-	if (!(devices instanceof File)) error(400, 'No devices file');
+	const file = (await request.formData()).get('devices');
+	if (!(file instanceof File)) error(400, 'No devices file');
 
-	await fs.promises.mkdir(dir, { recursive: true });
-	await fs.promises.writeFile(filePath, Buffer.from(await devices.arrayBuffer()));
+	const result = await writeDevices(await file.text());
+	if (!result.ok) return json({ message: result.message }, { status: 400 });
 
 	return new Response('OK');
 }

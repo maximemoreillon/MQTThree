@@ -2,7 +2,7 @@
 	import { T } from '@threlte/core';
 	import { ContactShadows, Grid, GLTF, OrbitControls, interactivity } from '@threlte/extras';
 	import { onMount } from 'svelte';
-	import type { Device } from '#lib/devices.ts';
+	import { deviceKey, type Device } from '#lib/devices.ts';
 	import Light from './devices/Light.svelte';
 	import Fan from './devices/Fan.svelte';
 	import Sensor from './devices/Sensor.svelte';
@@ -12,7 +12,11 @@
 		onModelLoad,
 		onModelError,
 		onDevicesError
-	}: { onModelLoad?: () => void; onModelError?: () => void; onDevicesError?: () => void } = $props();
+	}: {
+		onModelLoad?: () => void;
+		onModelError?: () => void;
+		onDevicesError?: (message: string) => void;
+	} = $props();
 
 	const modelPath = '/api/model';
 
@@ -23,11 +27,14 @@
 	onMount(async () => {
 		try {
 			const response = await fetch('/api/devices');
-			if (!response.ok) throw new Error(`Failed to fetch devices (${response.status})`);
+			if (!response.ok) {
+				const body = await response.json().catch(() => undefined);
+				throw new Error(body?.message ?? `Failed to load the devices (${response.status})`);
+			}
 			devices = await response.json();
 		} catch (error) {
 			console.error(error);
-			onDevicesError?.();
+			onDevicesError?.((error as Error).message);
 		}
 	});
 </script>
@@ -57,7 +64,7 @@
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
-{#each devices as device, index (index)}
+{#each devices as device (deviceKey(device))}
 	{#if device.type === 'light'}
 		<Light {device} />
 	{:else if device.type === 'fan'}

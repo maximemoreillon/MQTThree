@@ -8,8 +8,8 @@
 	let { device }: { device: LockDevice } = $props();
 
 	const opacity = 0.25;
-	const payloadLocked = $derived(device.payload?.locked ?? 'locked');
-	const payloadUnlocked = $derived(device.payload?.unlocked ?? 'unlocked');
+	const payloadLocked = $derived(device.payload.locked);
+	const payloadUnlocked = $derived(device.payload.unlocked);
 
 	let deviceState = $state<string | undefined>();
 	const isLocked = $derived(sameState(deviceState, payloadLocked));

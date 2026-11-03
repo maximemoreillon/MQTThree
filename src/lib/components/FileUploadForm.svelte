@@ -14,7 +14,11 @@
 
 		status = 'Uploading...';
 		const response = await fetch(endpoint, { method: 'POST', body });
-		status = response.ok ? 'Upload OK' : `Upload failed (${response.status})`;
+		if (response.ok) status = 'Upload OK';
+		else {
+			const body = await response.json().catch(() => undefined);
+			status = `Upload failed: ${body?.message ?? response.status}`;
+		}
 	}
 </script>
 
@@ -24,7 +28,7 @@
 		<span class="material-icons">upload</span>
 		Upload
 	</button>
-	{#if status}<span>{status}</span>{/if}
+	{#if status}<span class="status">{status}</span>{/if}
 </form>
 
 <style>
@@ -33,5 +37,9 @@
 		align-items: center;
 		gap: 1em;
 		flex-wrap: wrap;
+	}
+
+	.status {
+		white-space: pre-line;
 	}
 </style>

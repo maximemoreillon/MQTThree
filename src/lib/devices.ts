@@ -1,36 +1,26 @@
+import type { z } from 'zod';
+import type {
+	deviceSchema,
+	fanSchema,
+	lightSchema,
+	lockSchema,
+	sensorSchema
+} from './deviceSchema.ts';
+
 export type Vec3 = { x: number; y: number; z: number };
 
-type BaseDevice = {
-	topic: string;
-	position: Vec3;
-	rotation?: Partial<Vec3>;
-};
+export type Device = z.infer<typeof deviceSchema>;
+export type LightDevice = z.infer<typeof lightSchema>;
+export type FanDevice = z.infer<typeof fanSchema>;
+export type SensorDevice = z.infer<typeof sensorSchema>;
+export type LockDevice = z.infer<typeof lockSchema>;
 
-export type LightDevice = BaseDevice & {
-	type: 'light';
-	commandTopic: string;
-	payload?: { on?: string; off?: string };
-};
-
-export type FanDevice = BaseDevice & {
-	type: 'fan';
-	commandTopic: string;
-	payload?: { on?: string; off?: string };
-};
-
-export type SensorDevice = BaseDevice & {
-	type: 'sensor';
-	key: string;
-	unit?: string;
-};
-
-export type LockDevice = BaseDevice & {
-	type: 'lock';
-	commandTopic: string;
-	payload?: { locked?: string; unlocked?: string };
-};
-
-export type Device = LightDevice | FanDevice | SensorDevice | LockDevice;
+/**
+ * Stable identity of a device: its status topic, plus the key for sensors,
+ * since several sensors can read different fields of the same message
+ */
+export const deviceKey = (device: Device) =>
+	device.type === 'sensor' ? `${device.topic}#${device.key}` : device.topic;
 
 export const toArray = ({ x, y, z }: Vec3): [number, number, number] => [x, y, z];
 

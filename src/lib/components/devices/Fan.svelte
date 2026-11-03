@@ -10,8 +10,8 @@
 	const scale = 0.015;
 	const opacity = 0.25;
 	const rotationSpeed = 10; // rad/s
-	const payloadOn = $derived(device.payload?.on ?? 'on');
-	const payloadOff = $derived(device.payload?.off ?? 'off');
+	const payloadOn = $derived(device.payload.on);
+	const payloadOff = $derived(device.payload.off);
 
 	let deviceState = $state<string | undefined>();
 	const isOn = $derived(sameState(deviceState, payloadOn));

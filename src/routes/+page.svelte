@@ -25,7 +25,7 @@
 					modelLoaded = true;
 					addError('Failed to load the 3D model');
 				}}
-				onDevicesError={() => addError('Failed to load the devices')}
+				onDevicesError={addError}
 			/>
 		</Canvas>
 	</div>
@@ -76,6 +76,7 @@
 		border-radius: 4px;
 		background: var(--error);
 		color: #fff;
+		white-space: pre-line;
 	}
 
 	.threejs_wrapper {
