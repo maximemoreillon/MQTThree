@@ -16,7 +16,7 @@ export default defineConfig({
 			},
 			// PWA options
 			{
-				workbox: {
+				generateSW: {
 					// The app has no prerendered pages, which the plugin's default glob patterns expect
 					globStrict: false,
 					// No offline fallback page: pages are server-rendered and the app is useless offline anyway

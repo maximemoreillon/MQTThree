@@ -3,26 +3,32 @@
 	import { untrack } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { connect, hasClient } from '#lib/mqtt.svelte.ts';
+	import { connect, disconnect, hasClient, mqttState } from '#lib/mqtt.svelte.ts';
+	import { clearCredentials, loadCredentials } from '#lib/credentials.ts';
 
 	let { children } = $props();
 
-	async function enforceAuth() {
+	function ensureConnected() {
 		// Once created, the MQTT client handles reconnections by itself
 		if (hasClient()) return;
-		try {
-			const response = await fetch('/api/mqttcredentials');
-			if (!response.ok) throw new Error(`Failed to get MQTT credentials (${response.status})`);
-			const { username, password } = await response.json();
-			connect(username, password);
-		} catch (error) {
-			console.error(error);
-			goto('/login');
-		}
+		const credentials = loadCredentials();
+		// Logged in (the server let us through) but credentials are gone, e.g. new browser session
+		if (!credentials) return goto('/login');
+		connect(credentials.username, credentials.password);
 	}
 
 	$effect(() => {
-		if (page.url.pathname !== '/login') untrack(enforceAuth);
+		if (page.url.pathname !== '/login') untrack(ensureConnected);
+	});
+
+	// The broker rejected the stored credentials, e.g. password changed
+	$effect(() => {
+		if (!mqttState.authFailed) return;
+		untrack(() => {
+			clearCredentials();
+			disconnect();
+			goto('/login');
+		});
 	});
 </script>
 

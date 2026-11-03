@@ -1,9 +1,10 @@
 import mqtt, { type MqttClient } from 'mqtt';
 import { PUBLIC_MQTT_HOST, PUBLIC_MQTT_PORT, PUBLIC_MQTT_USE_SSL } from '$app/env/public';
+import { isAuthError } from '#lib/mqttErrors.ts';
 
 type Handler = (payload: unknown) => void;
 
-export const mqttState = $state({ connected: false });
+export const mqttState = $state({ connected: false, authFailed: false });
 
 let client: MqttClient | undefined;
 const handlers = new Map<string, Set<Handler>>();
@@ -25,7 +26,13 @@ export function connect(username: string, password: string) {
 
 	client.on('connect', () => (mqttState.connected = true));
 	client.on('close', () => (mqttState.connected = false));
-	client.on('error', (error) => console.error('MQTT error', error));
+	client.on('error', (error) => {
+		console.error('MQTT error', error);
+		if (!isAuthError(error)) return;
+		// Retrying with rejected credentials is pointless
+		disconnect();
+		mqttState.authFailed = true;
+	});
 	client.on('message', (topic, message) => {
 		const topicHandlers = handlers.get(topic);
 		if (!topicHandlers) return;
@@ -35,6 +42,13 @@ export function connect(username: string, password: string) {
 
 	// Subscriptions registered before the client existed
 	for (const topic of handlers.keys()) client.subscribe(topic);
+}
+
+export function disconnect() {
+	client?.end(true);
+	client = undefined;
+	mqttState.connected = false;
+	mqttState.authFailed = false;
 }
 
 /**

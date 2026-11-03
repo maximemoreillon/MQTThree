@@ -1,12 +1,33 @@
-<!-- This is using the default form action as it helps setting cookies -->
+<!-- Credentials are checked by the server against the MQTT broker, then kept in the browser to connect to it directly -->
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
+	import type { SubmitFunction } from '$app/forms';
+	import { saveCredentials } from '#lib/credentials.ts';
+	import { disconnect } from '#lib/mqtt.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
+
+	let pending = $state(false);
+
+	const handleSubmit: SubmitFunction = ({ formData }) => {
+		pending = true;
+		const username = String(formData.get('username'));
+		const password = String(formData.get('password'));
+		const remember = formData.get('remember') === 'on';
+
+		return async ({ result }) => {
+			pending = false;
+			if (result.type === 'redirect') {
+				disconnect();
+				saveCredentials({ username, password }, remember);
+			}
+			await applyAction(result);
+		};
+	};
 </script>
 
-<form method="post" use:enhance>
+<form method="post" use:enhance={handleSubmit}>
 	<label class="field">
 		<span class="material-icons">person</span>
 		<input name="username" placeholder="Username" autocomplete="username" required />
@@ -21,8 +42,12 @@
 			required
 		/>
 	</label>
+	<label class="remember">
+		<input type="checkbox" name="remember" />
+		Remember me on this device
+	</label>
 	{#if form?.message}<p class="error">{form.message}</p>{/if}
-	<button type="submit" class="button">
+	<button type="submit" class="button" disabled={pending}>
 		<span class="material-icons">login</span>
 		Login
 	</button>
@@ -54,6 +79,12 @@
 		background: transparent;
 		color: inherit;
 		font: inherit;
+	}
+
+	.remember {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 	}
 
 	.error {

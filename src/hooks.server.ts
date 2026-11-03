@@ -1,23 +1,22 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
-import { JWT_SECRET, MQTT_PASSWORD, MQTT_USERNAME } from '$app/env/private';
-import { checkAuth } from '#lib/auth.ts';
+import { readSession, usesRandomSecret } from '#lib/server/session.ts';
+
+const PUBLIC_PATHS = ['/login'];
 
 export const init: ServerInit = () => {
-	const missing = Object.entries({ MQTT_USERNAME, MQTT_PASSWORD, JWT_SECRET })
-		.filter(([, value]) => !value)
-		.map(([name]) => name);
-	if (missing.length) throw new Error(`Missing environment variables: ${missing.join(', ')}`);
+	if (usesRandomSecret)
+		console.warn('SESSION_SECRET is not set: using a random one, sessions will not survive restarts');
 };
 
 export const handle: Handle = async ({ event, resolve }) => {
-	if (event.url.pathname.startsWith('/api')) {
-		try {
-			checkAuth(event);
-		} catch {
-			// TODO: consider redirecting
-			error(401, 'You shall not pass!');
-		}
+	const session = readSession(event.cookies);
+	event.locals.username = session?.username;
+
+	const { pathname } = event.url;
+	if (!session && !PUBLIC_PATHS.includes(pathname)) {
+		if (pathname.startsWith('/api')) error(401, 'You shall not pass!');
+		redirect(303, '/login');
 	}
 
 	return resolve(event);
