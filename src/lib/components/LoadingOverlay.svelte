@@ -1,46 +1,15 @@
 <script lang="ts">
+	import * as Card from '#lib/components/ui/card/index.ts';
+	import { Spinner } from '#lib/components/ui/spinner/index.ts';
+
 	let { message }: { message: string } = $props();
 </script>
 
-<div class="overlay" role="status">
-	<div class="card">
-		<div class="spinner"></div>
-		<span>{message}</span>
-	</div>
+<div class="fixed inset-0 grid place-items-center bg-black/50" role="status">
+	<Card.Root>
+		<Card.Content class="flex flex-col items-center gap-4 px-8">
+			<Spinner class="size-8" />
+			<span>{message}</span>
+		</Card.Content>
+	</Card.Root>
 </div>
-
-<style>
-	.overlay {
-		position: fixed;
-		inset: 0;
-		display: grid;
-		place-items: center;
-		background: rgb(0 0 0 / 0.5);
-	}
-
-	.card {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1em;
-		padding: 2em;
-		border-radius: 8px;
-		background: var(--surface);
-		color: var(--on-surface);
-	}
-
-	.spinner {
-		width: 3em;
-		height: 3em;
-		border: 4px solid var(--primary);
-		border-top-color: transparent;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-</style>

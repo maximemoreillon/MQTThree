@@ -1,9 +1,11 @@
 import adapter from '@sveltejs/adapter-node';
+import tailwindcss from '@tailwindcss/vite';
 import { withPwa } from '@vite-pwa/sveltekit';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [
+		tailwindcss(),
 		withPwa(
 			// SvelteKit options
 			{

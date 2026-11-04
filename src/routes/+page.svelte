@@ -3,6 +3,9 @@
 	import Scene from '#lib/components/Scene.svelte';
 	import LoadingOverlay from '#lib/components/LoadingOverlay.svelte';
 	import { mqttState } from '#lib/mqtt.svelte.ts';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import * as Alert from '#lib/components/ui/alert/index.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
 
 	let modelLoaded = $state(false);
 	let errors = $state<string[]>([]);
@@ -17,7 +20,7 @@
 </script>
 
 {#if hasConnected}
-	<div class="threejs_wrapper">
+	<div class="h-svh w-screen bg-linear-to-b from-[rgb(13_19_32)] to-[rgb(8_12_21)]">
 		<Canvas>
 			<Scene
 				onModelLoad={() => (modelLoaded = true)}
@@ -38,50 +41,21 @@
 {/if}
 
 {#if errors.length}
-	<ul class="errors" role="alert">
+	<div class="fixed bottom-8 left-1/2 flex w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 flex-col gap-2">
 		{#each errors as error, index (index)}
-			<li>{error}</li>
+			<Alert.Root variant="destructive">
+				<Alert.Description class="whitespace-pre-line">{error}</Alert.Description>
+			</Alert.Root>
 		{/each}
-	</ul>
+	</div>
 {/if}
 
-<a href="/config" class="settings_button" aria-label="Settings">
-	<span class="material-icons">settings</span>
-</a>
-
-<style>
-	.settings_button {
-		position: fixed;
-		top: 2em;
-		left: 2em;
-		display: grid;
-		place-items: center;
-		width: 56px;
-		height: 56px;
-		border-radius: 50%;
-		background: var(--primary);
-		color: #fff;
-		text-decoration: none;
-		box-shadow: 0 3px 6px rgb(0 0 0 / 0.3);
-	}
-
-	.errors {
-		position: fixed;
-		bottom: 2em;
-		left: 50%;
-		transform: translateX(-50%);
-		margin: 0;
-		padding: 0.75em 1.25em;
-		list-style: none;
-		border-radius: 4px;
-		background: var(--error);
-		color: #fff;
-		white-space: pre-line;
-	}
-
-	.threejs_wrapper {
-		width: 100vw;
-		height: 100vh;
-		background: linear-gradient(180deg, rgb(13 19 32) 0%, rgb(8 12 21) 100%);
-	}
-</style>
+<Button
+	href="/config"
+	size="icon-lg"
+	variant="secondary"
+	class="fixed top-8 left-8 rounded-full shadow-md"
+	aria-label="Settings"
+>
+	<SettingsIcon />
+</Button>
