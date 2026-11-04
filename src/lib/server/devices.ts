@@ -26,7 +26,13 @@ export function parseDevices(text: string): ParseResult {
 }
 
 export async function readDevices(): Promise<ParseResult> {
-	return parseDevices(await fs.promises.readFile(filePath, 'utf8'));
+	try {
+		return parseDevices(await fs.promises.readFile(filePath, 'utf8'));
+	} catch (error) {
+		// No file yet, e.g. a fresh install: an empty scene until one is uploaded
+		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { ok: true, devices: [] };
+		throw error;
+	}
 }
 
 /** Writes the file only if it is valid, so a bad upload never replaces a working config */
