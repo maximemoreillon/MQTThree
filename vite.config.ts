@@ -18,6 +18,8 @@ export default defineConfig({
 			},
 			// PWA options
 			{
+				// Activate a new service worker as soon as it's installed: there is no "update available" prompt in the UI
+				registerType: 'autoUpdate',
 				generateSW: {
 					// The app has no prerendered pages, which the plugin's default glob patterns expect
 					globStrict: false,
