@@ -20,7 +20,7 @@
 </script>
 
 {#if hasConnected}
-	<div class="h-svh w-screen bg-linear-to-b from-[rgb(13_19_32)] to-[rgb(8_12_21)]">
+	<div class="h-svh w-screen bg-linear-to-b from-muted to-background">
 		<Canvas>
 			<Scene
 				onModelLoad={() => (modelLoaded = true)}
@@ -53,8 +53,7 @@
 <Button
 	href="/config"
 	size="icon-lg"
-	variant="secondary"
-	class="fixed top-8 left-8 rounded-full shadow-md"
+	class="fixed top-8 right-8 rounded-full shadow-md"
 	aria-label="Settings"
 >
 	<SettingsIcon />
