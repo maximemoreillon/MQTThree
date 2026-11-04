@@ -10,6 +10,46 @@ A 3D view of your home in which MQTT devices (lights, air conditioners, sensors,
 
 No broker-specific configuration is needed beyond users with the right ACLs and a WebSocket listener.
 
+## devices.yml
+
+A list of devices. Status messages are expected to be JSON, and commands are sent as `{"state": "<payload>"}`.
+
+```yaml
+# Living room ceiling light
+- type: light
+  topic: light-d084cb/state # status topic, its `state` field holds the payload
+  commandTopic: light-d084cb/command
+  payload: # optional, these are the defaults
+    on: "on"
+    off: "off"
+  position: { x: -2, y: 2.1, z: 1.5 } # in the model's coordinates
+  rotation: { y: 180 } # optional, in degrees, every axis optional
+
+# Air conditioner, shown as a fan that spins when on
+- type: fan
+  topic: aircon-d8e608/state
+  commandTopic: aircon-d8e608/command
+  payload: { on: ac_on, off: "off" }
+  position: { x: -3.2, y: 2.1, z: -0.5 }
+
+# Shows one field of a status message
+- type: sensor
+  topic: sensor-dbc37a/temperature
+  key: temperature
+  unit: °C # optional
+  position: { x: -3.2, y: 2.1, z: 2.5 }
+
+- type: lock
+  topic: lock-d0dd07/state
+  commandTopic: lock-d0dd07/command
+  payload: # optional, these are the defaults
+    locked: locked
+    unlocked: unlocked
+  position: { x: 3.5, y: 1.2, z: -0.8 }
+```
+
+The file is checked when it is uploaded (an invalid file is rejected and the current one kept) and when the app loads it. Unknown fields are errors, so typos don't go unnoticed. Each device must be unique: by topic, or by topic and key for sensors, which can read different fields of the same message.
+
 ## Configuration
 
 | Variable | Default | Description |
