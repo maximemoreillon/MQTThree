@@ -1,89 +1,61 @@
 <script lang="ts">
-  import { Canvas } from "@threlte/core";
-  import Scene from "$lib/components/Scene.svelte";
-  import Fab, { Icon } from "@smui/fab";
-  import Dialog, { Content } from "@smui/dialog";
-  import CircularProgress from "@smui/circular-progress";
-  import { onMount } from "svelte";
-  import {
-    init as mqttInit,
-    login as mqttLogin,
-    connected as mqttConnected,
-  } from "$lib/mqtt";
+	import { Canvas } from '@threlte/core';
+	import Scene from '#lib/components/Scene.svelte';
+	import LoadingOverlay from '#lib/components/LoadingOverlay.svelte';
+	import { mqttState } from '#lib/mqtt.svelte.ts';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import * as Alert from '#lib/components/ui/alert/index.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
 
-  let modelLoaded = false;
+	let modelLoaded = $state(false);
+	let errors = $state<string[]>([]);
 
-  export let data;
+	// Keep the scene once it has been shown, so a dropped connection doesn't reload the model
+	let hasConnected = $state(false);
+	$effect(() => {
+		if (mqttState.connected) hasConnected = true;
+	});
 
-  onMount(() => {
-    mqttInit();
-    const { username, password } = data.mqttCredentials;
-    mqttLogin(username, password);
-  });
+	const addError = (message: string) => (errors = [...errors, message]);
 </script>
 
-{#if $mqttConnected}
-  <div class="threejs_wrapper">
-    <Canvas>
-      <Scene
-        devices={data.devices}
-        on:modelLoad={() => (modelLoaded = true)}
-        on:modelError={() => (modelLoaded = true)}
-      />
-    </Canvas>
-  </div>
-
-  <Dialog open={!modelLoaded} scrimClickAction="" escapeKeyAction="">
-    <Content class="modal_content">
-      <CircularProgress style="height: 3em; width: 3em;" indeterminate />
-      <span>Loading model...</span>
-    </Content>
-    <!-- Dummy button to deal with focusTrap errors -->
-    <button style="opacity: 0; position: absolute" />
-  </Dialog>
-{:else}
-  <Dialog open={!$mqttConnected} scrimClickAction="" escapeKeyAction="">
-    <Content class="modal_content">
-      <CircularProgress style="height: 3em; width: 3em; " indeterminate />
-      <span>Connecting to MQTT...</span>
-    </Content>
-    <!-- Dummy button to deal with focusTrap errors -->
-    <button style="opacity: 0; position: absolute" />
-  </Dialog>
+{#if hasConnected}
+	<div class="h-svh w-screen bg-linear-to-b from-[rgb(13_19_32)] to-[rgb(8_12_21)]">
+		<Canvas>
+			<Scene
+				onModelLoad={() => (modelLoaded = true)}
+				onModelError={() => {
+					modelLoaded = true;
+					addError('Failed to load the 3D model');
+				}}
+				onDevicesError={addError}
+			/>
+		</Canvas>
+	</div>
 {/if}
 
-<Fab color="primary" href="/config" class="settings_button">
-  <Icon class="material-icons">settings</Icon>
-</Fab>
+{#if !mqttState.connected}
+	<LoadingOverlay message={hasConnected ? 'Reconnecting to MQTT...' : 'Connecting to MQTT...'} />
+{:else if !modelLoaded}
+	<LoadingOverlay message="Loading model..." />
+{/if}
 
-<style>
-  :global(.settings_button) {
-    position: fixed;
-    top: 2em;
-    left: 2em;
-  }
+{#if errors.length}
+	<div class="fixed bottom-8 left-1/2 flex w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 flex-col gap-2">
+		{#each errors as error, index (index)}
+			<Alert.Root variant="destructive">
+				<Alert.Description class="whitespace-pre-line">{error}</Alert.Description>
+			</Alert.Root>
+		{/each}
+	</div>
+{/if}
 
-  :global(body) {
-    margin: 0;
-  }
-
-  :global(.modal_content) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1em;
-    padding: 2em;
-  }
-
-  .threejs_wrapper {
-    width: 100vw;
-    height: 100vh;
-    background: rgb(13, 19, 32);
-    background: linear-gradient(
-      180deg,
-      rgba(13, 19, 32, 1) 0%,
-      rgba(8, 12, 21, 1) 100%
-    );
-  }
-</style>
+<Button
+	href="/config"
+	size="icon-lg"
+	variant="secondary"
+	class="fixed top-8 left-8 rounded-full shadow-md"
+	aria-label="Settings"
+>
+	<SettingsIcon />
+</Button>

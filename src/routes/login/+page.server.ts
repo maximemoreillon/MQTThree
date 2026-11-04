@@ -1,33 +1,35 @@
-import { redirect, fail} from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
-import {env} from "$env/dynamic/private"
-import jwt from 'jsonwebtoken'
+import { checkCredentials } from '#lib/server/broker.ts';
+import { createSession } from '#lib/server/session.ts';
+import { clearFailures, isRateLimited, recordFailure } from '#lib/server/rateLimit.ts';
 
-const {MQTT_USERNAME, MQTT_PASSWORD, JWT_SECRET} = env
-
-// NOTE: Actions always use POST requests
 export const actions: Actions = {
-    default: async ({ request, cookies }) => {
+	// The MQTT broker is the authority: credentials are valid if the broker accepts them
+	default: async ({ request, cookies, getClientAddress }) => {
+		const client = getClientAddress();
+		if (isRateLimited(client))
+			return fail(429, { message: 'Too many failed attempts, try again later' });
 
-      const formData = await request.formData();
-      const username = formData.get('username');
-      const password = formData.get('password');
+		const formData = await request.formData();
+		const username = String(formData.get('username') ?? '');
+		const password = String(formData.get('password') ?? '');
+		const remember = formData.get('remember') === 'on';
 
-      if (username !== MQTT_USERNAME || password !== MQTT_PASSWORD) return fail(401, {message: 'Access denied'})
+		if (!username || !password)
+			return fail(400, { message: 'Username and password are required' });
 
+		const result = await checkCredentials(username, password);
 
-      const cookiesOptions = { 
-        path: '/', 
-        maxAge: 60 * 60 * 24 * 365, 
-      }
+		if (result === 'unreachable') return fail(502, { message: 'MQTT broker unreachable' });
 
-      // TODO: find out if jwt really necessary
-      const token = jwt.sign({}, JWT_SECRET)
+		if (result === 'rejected') {
+			recordFailure(client);
+			return fail(401, { message: 'Access denied' });
+		}
 
-      cookies.set( 'token', token, cookiesOptions )
-
-      throw redirect(302, '/')
-
-    }
-        
-}
+		clearFailures(client);
+		createSession(cookies, username, remember);
+		redirect(303, '/');
+	}
+};

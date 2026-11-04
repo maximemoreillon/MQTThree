@@ -1,62 +1,44 @@
 <script lang="ts">
-  import { T } from "@threlte/core";
-  import { interactivity } from "@threlte/extras";
-  import type { Vector3 } from "three";
-  import { client, on } from "$lib/mqtt";
-  import MQTT from "paho-mqtt";
-  import { onMount } from "svelte";
-  import LightModel from "./LightModel.svelte";
+	import { T } from '@threlte/core';
+	import { onMount } from 'svelte';
+	import { publish, subscribe } from '#lib/mqtt.svelte.ts';
+	import { getState, sameState, toArray, toRotation, type LightDevice } from '#lib/devices.ts';
+	import LightModel from './LightModel.svelte';
 
-  interactivity();
+	let { device }: { device: LightDevice } = $props();
 
-  export let device: any;
+	const scale = 0.015;
+	const payloadOn = $derived(device.payload.on);
+	const payloadOff = $derived(device.payload.off);
 
-  const payloadOn = device.payload?.on || "on";
-  const payloadOff = device.payload?.off || "off";
+	let deviceState = $state<string | undefined>();
+	const isOn = $derived(sameState(deviceState, payloadOn));
+	const color = $derived(isOn ? '#ffff00' : '#ffffff');
+	const opacity = $derived(isOn ? 0.5 : 0.25);
 
-  const scale = 0.015;
+	function handleClick() {
+		const targetState = isOn ? payloadOff : payloadOn;
+		publish(device.commandTopic, JSON.stringify({ state: targetState }));
+	}
 
-  let state: string = payloadOff;
-  $: isOn = state.toLowerCase() === payloadOn;
-  $: color = isOn ? "#ffff00" : "#ffffff";
-  $: opacity = isOn ? 0.5 : 0.25;
-
-  function handleClick() {
-    // state = state == "on" ? "off" : "on"
-    if (!client.isConnected()) return;
-    const targetState = state == payloadOn ? payloadOff : payloadOn;
-    const payload = JSON.stringify({ state: targetState });
-    const message = new MQTT.Message(payload);
-    message.destinationName = device.commandTopic;
-    client.send(message);
-  }
-
-  // TODO: subscribe if both mounted and mqtt connected
-  onMount(() => {
-    on("connected", () => {
-      client.subscribe(device.topic);
-    });
-
-    on("message", (message: MQTT.Message) => {
-      if (message.destinationName !== device.topic) return;
-      const payload = JSON.parse(message.payloadString);
-      state = payload.state;
-    });
-
-    if (client.isConnected()) client.subscribe(device.topic);
-  });
+	onMount(() =>
+		subscribe(device.topic, (payload) => {
+			deviceState = getState(payload) ?? deviceState;
+		})
+	);
 </script>
 
-<T.Group position={device.position.toArray()}>
-  <!-- Hitbox -->
-  <T.Mesh on:click={handleClick}>
-    <T.SphereGeometry args={[0.25]} />
-    <T.MeshStandardMaterial transparent {opacity} {color} />
-  </T.Mesh>
+<T.Group position={toArray(device.position)} rotation={toRotation(device.rotation)}>
+	<!-- Hitbox -->
+	<T.Mesh onclick={handleClick}>
+		<T.SphereGeometry args={[0.25]} />
+		<T.MeshStandardMaterial transparent {opacity} {color} />
+	</T.Mesh>
 
-  <LightModel {scale} position.z={24 * scale} />
+	<LightModel {scale} position.z={24 * scale} />
 
-  {#if isOn}
-    <T.PointLight intensity={0.1} />
-  {/if}
+	{#if isOn}
+		<!-- Physically based lighting (three r155+): intensity scaled by π vs. the old legacy value 0.1 -->
+		<T.PointLight intensity={0.1 * Math.PI} />
+	{/if}
 </T.Group>

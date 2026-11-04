@@ -6,79 +6,74 @@ License: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
 Source: https://sketchfab.com/3d-models/light-bulb-1bf43ed7628e48e7bceae6f6c5ac06d9
 Title: Light-bulb
 -->
+<script lang="ts">
+	import type * as THREE from 'three';
+	import { Group } from 'three';
+	import { T, type Props } from '@threlte/core';
+	import { useDraco, useGltf } from '@threlte/extras';
 
-<script>
-  import { Group } from "three";
-  import { T, forwardEventHandlers } from "@threlte/core";
-  import { useGltf } from "@threlte/extras";
+	let { children, ...props }: Props<THREE.Group> = $props();
 
-  export const ref = new Group();
-
-  const gltf = useGltf("/models/light-transformed.glb", { useDraco: true });
-
-  const component = forwardEventHandlers();
+	const ref = new Group();
+	const gltf = useGltf('/models/light-transformed.glb', { dracoLoader: useDraco() });
 </script>
 
-<T is={ref} dispose={false} {...$$restProps} bind:this={$component}>
-  {#await gltf}
-    <slot name="fallback" />
-  {:then gltf}
-    <T.Mesh
-      geometry={gltf.nodes.Object_5.geometry}
-      material={gltf.materials.surfaceShader1}
-      position={[0, -10.16, -23.15]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_7.geometry}
-      material={gltf.materials.lambert2}
-      position={[0, 0.46, -23.15]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_9.geometry}
-      material={gltf.materials.lambert3}
-      position={[0, 0, -23.15]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_11.geometry}
-      material={gltf.materials.lambert3}
-      position={[0, 0, -23.15]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_13.geometry}
-      material={gltf.materials.lambert3}
-      position={[-1.2, -1.11, -23.15]}
-      rotation={[0, 0, 0.33]}
-      scale={[0.17, 0.1, 0.22]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_15.geometry}
-      material={gltf.materials.lambert3}
-      position={[1.28, -1.11, -23.15]}
-      rotation={[0, 0, -0.33]}
-      scale={[-0.17, 0.1, 0.22]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_17.geometry}
-      material={gltf.materials.lambert3}
-      position={[-0.57, 2.25, -23.15]}
-      scale={[0.12, 0.09, 0.13]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_19.geometry}
-      material={gltf.materials.lambert3}
-      position={[0.55, 2.25, -23.15]}
-      scale={[-0.12, 0.09, 0.13]}
-    />
-    <T.Mesh
-      geometry={gltf.nodes.Object_21.geometry}
-      material={gltf.materials.lambert1}
-      position={[4.53, 4.26, -23.15]}
-      rotation={[0, 0, -1.21]}
-      scale={0.01}
-    />
-  {:catch error}
-    <slot name="error" {error} />
-  {/await}
+<T is={ref} dispose={false} {...props}>
+	{#await gltf then gltf}
+		<T.Mesh
+			geometry={gltf.nodes.Object_5.geometry}
+			material={gltf.materials.surfaceShader1}
+			position={[0, -10.16, -23.15]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_7.geometry}
+			material={gltf.materials.lambert2}
+			position={[0, 0.46, -23.15]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_9.geometry}
+			material={gltf.materials.lambert3}
+			position={[0, 0, -23.15]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_11.geometry}
+			material={gltf.materials.lambert3}
+			position={[0, 0, -23.15]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_13.geometry}
+			material={gltf.materials.lambert3}
+			position={[-1.2, -1.11, -23.15]}
+			rotation={[0, 0, 0.33]}
+			scale={[0.17, 0.1, 0.22]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_15.geometry}
+			material={gltf.materials.lambert3}
+			position={[1.28, -1.11, -23.15]}
+			rotation={[0, 0, -0.33]}
+			scale={[-0.17, 0.1, 0.22]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_17.geometry}
+			material={gltf.materials.lambert3}
+			position={[-0.57, 2.25, -23.15]}
+			scale={[0.12, 0.09, 0.13]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_19.geometry}
+			material={gltf.materials.lambert3}
+			position={[0.55, 2.25, -23.15]}
+			scale={[-0.12, 0.09, 0.13]}
+		/>
+		<T.Mesh
+			geometry={gltf.nodes.Object_21.geometry}
+			material={gltf.materials.lambert1}
+			position={[4.53, 4.26, -23.15]}
+			rotation={[0, 0, -1.21]}
+			scale={0.01}
+		/>
+	{/await}
 
-  <slot {ref} />
+	{@render children?.({ ref })}
 </T>

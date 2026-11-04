@@ -1,11 +1,15 @@
-FROM node:20
-
+FROM node:24-alpine AS build
 WORKDIR /app
-COPY ./ .
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build && npm prune --omit=dev
 
-RUN npm install
-RUN npm run build
-
+FROM node:24-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/package.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/build ./build
 EXPOSE 3000
-
-CMD node build/index.js
+CMD ["node", "build/index.js"]

@@ -1,18 +1,18 @@
-// This is unused
+import { error, json } from '@sveltejs/kit';
+import { readDevices, writeDevices } from '#lib/server/devices.ts';
 
-import { json } from '@sveltejs/kit'
-import fs from 'fs'
-import path from 'path'
-import YAML from 'yaml'
-import { configDir, devicesFileName } from '$lib/config.js'
-
-const filePath = path.join(configDir, devicesFileName)
-
-export async function GET(){
-
-  const file = fs.readFileSync(filePath, 'utf8')
-  const devices = YAML.parse(file)
-
-  return json(devices)
+export async function GET() {
+	const result = await readDevices();
+	if (!result.ok) return json({ message: `devices.yml is invalid:\n${result.message}` }, { status: 500 });
+	return json(result.devices);
 }
 
+export async function POST({ request }) {
+	const file = (await request.formData()).get('devices');
+	if (!(file instanceof File)) error(400, 'No devices file');
+
+	const result = await writeDevices(await file.text());
+	if (!result.ok) return json({ message: result.message }, { status: 400 });
+
+	return new Response('OK');
+}

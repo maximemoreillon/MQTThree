@@ -1,86 +1,70 @@
 <script lang="ts">
-  import { T } from "@threlte/core";
-  import {
-    ContactShadows,
-    Grid,
-    OrbitControls,
-    interactivity,
-    Text,
-    GLTF,
-  } from "@threlte/extras";
-  import Light from "./devices/Light.svelte";
-  import Fan from "./devices/Fan.svelte";
-  import Sensor from "./devices/Sensor.svelte";
-  import Lock from "./devices/Lock.svelte";
-  import { orbitControlsEnabled } from "$lib/unused/states";
-  import { Vector3 } from "three";
+	import { T } from '@threlte/core';
+	import { ContactShadows, GLTF, OrbitControls, interactivity } from '@threlte/extras';
+	import { onMount } from 'svelte';
+	import { deviceKey, type Device } from '#lib/devices.ts';
+	import Light from './devices/Light.svelte';
+	import Fan from './devices/Fan.svelte';
+	import Sensor from './devices/Sensor.svelte';
+	import Lock from './devices/Lock.svelte';
 
-  import { createEventDispatcher } from "svelte";
+	let {
+		onModelLoad,
+		onModelError,
+		onDevicesError
+	}: {
+		onModelLoad?: () => void;
+		onModelError?: () => void;
+		onDevicesError?: (message: string) => void;
+	} = $props();
 
-  const modelPath = "/api/model";
-  const dispatch = createEventDispatcher();
+	const modelPath = '/api/model';
 
-  interactivity();
+	interactivity();
 
-  export let devices: any[] = [];
+	let devices = $state<Device[]>([]);
 
-  $: formattedDevices = devices.map((d: any) => ({
-    ...d,
-    position: new Vector3(d.position.x, d.position.y, d.position.z),
-  }));
+	onMount(async () => {
+		try {
+			const response = await fetch('/api/devices');
+			if (!response.ok) {
+				const body = await response.json().catch(() => undefined);
+				throw new Error(body?.message ?? `Failed to load the devices (${response.status})`);
+			}
+			devices = await response.json();
+		} catch (error) {
+			console.error(error);
+			onDevicesError?.((error as Error).message);
+		}
+	});
 </script>
 
 <T.PerspectiveCamera
-  makeDefault
-  fov={50}
-  on:create={({ ref }) => {
-    ref.position.set(-10, 10, 10);
-    ref.lookAt(0, 0, 0);
-  }}
+	makeDefault
+	fov={50}
+	oncreate={(ref) => {
+		ref.position.set(-10, 10, 10);
+		ref.lookAt(0, 0, 0);
+	}}
 >
-  <OrbitControls enabled={$orbitControlsEnabled} />
+	<OrbitControls />
 </T.PerspectiveCamera>
 
-<T.AmbientLight intensity={0.2} />
-
-<Grid
-  position.y={0}
-  cellColor="#ffffff"
-  sectionColor="#c00000"
-  sectionThickness={2}
-  fadeDistance={25}
-  cellSize={2}
-/>
-
-<!-- Pointer Events do not work on planes-->
-<!-- <T.Plane
-  args={[new Vector3(0, 1, 0), 0]}
-  on:pointermove={() => console.log("hi")}
-/> -->
+<!-- Physically based lighting (three r155+): intensity scaled by π vs. the old legacy value 0.2 -->
+<T.AmbientLight intensity={0.2 * Math.PI} />
 
 <ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
-{#each formattedDevices.filter(({ type }) => type === "light") as device}
-  <Light {device} />
+{#each devices as device (deviceKey(device))}
+	{#if device.type === 'light'}
+		<Light {device} />
+	{:else if device.type === 'fan'}
+		<Fan {device} />
+	{:else if device.type === 'sensor'}
+		<Sensor {device} />
+	{:else if device.type === 'lock'}
+		<Lock {device} />
+	{/if}
 {/each}
 
-{#each formattedDevices.filter(({ type }) => type === "fan") as device}
-  <Fan {device} />
-{/each}
-
-{#each formattedDevices.filter(({ type }) => type === "sensor") as device}
-  <Sensor {device} />
-{/each}
-
-{#each formattedDevices.filter(({ type }) => type === "lock") as device}
-  <Lock {device} />
-{/each}
-
-<GLTF
-  url={modelPath}
-  interactive
-  castShadow
-  receiveShadow
-  on:load={() => dispatch("modelLoad")}
-  on:error={() => dispatch("modelError")}
-/>
+<GLTF url={modelPath} castShadow receiveShadow onload={onModelLoad} onerror={onModelError} />

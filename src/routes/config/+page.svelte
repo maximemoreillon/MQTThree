@@ -1,72 +1,50 @@
-<!-- PROBLEM: This page can be accessed without being authenticated -->
 <script lang="ts">
-  import Card, { Content } from "@smui/card";
-  import Button, { Label, Icon } from "@smui/button";
+	import { enhance } from '$app/forms';
+	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import LogOutIcon from '@lucide/svelte/icons/log-out';
+	import FileUploadForm from '#lib/components/FileUploadForm.svelte';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import * as Card from '#lib/components/ui/card/index.ts';
+	import { clearCredentials } from '#lib/credentials.ts';
+	import { disconnect } from '#lib/mqtt.svelte.ts';
+
+	function logout() {
+		clearCredentials();
+		disconnect();
+	}
 </script>
 
-<main>
-  <div>
-    <Button href="/" variant="raised">
-      <Icon class="material-icons">arrow_left</Icon>
+<div class="mx-auto flex max-w-xl flex-col gap-4 p-4">
+	<div class="flex items-center justify-between">
+		<Button href="/" variant="ghost">
+			<ArrowLeftIcon />
+			Back
+		</Button>
+		<form method="post" action="/logout" use:enhance={logout}>
+			<Button type="submit" variant="outline">
+				<LogOutIcon />
+				Log out
+			</Button>
+		</form>
+	</div>
 
-      <Label>Return</Label>
-    </Button>
-  </div>
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>3D model</Card.Title>
+			<Card.Description>The floor plan, as a .glb file</Card.Description>
+		</Card.Header>
+		<Card.Content>
+			<FileUploadForm endpoint="/api/model" field="model" accept=".glb" />
+		</Card.Content>
+	</Card.Root>
 
-  <Card>
-    <Content>
-      <h2>Model</h2>
-      <form method="POST" action="?/modelUpload" enctype="multipart/form-data">
-        <input type="file" accept=".glb" name="model" />
-        <Button type="submit" variant="raised">
-          <Icon class="material-icons">upload</Icon>
-          <Label>Upload</Label>
-        </Button>
-      </form>
-    </Content>
-  </Card>
-  <Card>
-    <Content>
-      <h2>Devices</h2>
-      <form method="POST" action="?/configUpload" enctype="multipart/form-data">
-        <input type="file" accept=".yaml,.yml" name="config" />
-        <Button type="submit" variant="raised">
-          <Icon class="material-icons">upload</Icon>
-          <Label>Upload</Label>
-        </Button>
-      </form>
-    </Content>
-  </Card>
-</main>
-
-<style>
-  main {
-    max-width: 30rem;
-    margin-inline: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 2em;
-    padding: 2em;
-  }
-
-  form {
-    display: flex;
-    align-items: center;
-    gap: 1em;
-  }
-
-  h2 {
-    font-size: x-large;
-    margin: 0;
-  }
-
-  form input[type="file"] {
-    flex-grow: 1;
-    border-radius: 0.5em;
-    cursor: pointer;
-  }
-
-  /* input[type="file"]::file-selector-button {
-
-  } */
-</style>
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>Devices</Card.Title>
+			<Card.Description>devices.yml, checked before it replaces the current one</Card.Description>
+		</Card.Header>
+		<Card.Content>
+			<FileUploadForm endpoint="/api/devices" field="devices" accept=".yaml,.yml" />
+		</Card.Content>
+	</Card.Root>
+</div>
